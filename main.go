@@ -1,44 +1,21 @@
+// Copyright © 2019 NAME HERE <EMAIL ADDRESS>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
-// http://ghodss.com/2014/the-right-way-to-handle-yaml-in-golang/
-
-import (
-	"fmt"
-	"gopkg.in/yaml.v2"
-)
-
-// T is an example struct
-type T struct {
-	Name string `yaml:"name"`
-	Arg1 string `yaml:"arg1"`
-	Arg2 int    `yaml:"arg2"`
-	Arg3 []int  `yaml:"arg3"`
-}
+import "github.com/mdobeck/sauced/cmd"
 
 func main() {
-	data := []byte(`
-name: My first test
-arg1: bumpitybump
-arg2: 2
-arg3: [3, 4]
-`)
-
-	t := T{}
-	err := yaml.Unmarshal(data, &t)
-	if err != nil {
-		fmt.Print("uh oh", err)
-	}
-	fmt.Println(t)
-	fmt.Println(t.Name)
-
-	d, err := yaml.Marshal(&t)
-	if err != nil {
-		fmt.Println("error: ", err)
-	}
-	fmt.Println(string(d))
-	// Cannot do a d.Name call here.  Its not a struct but a YAML object
-
-	fmt.Printf("hello, world\n")
-	for {
-	}
+	cmd.Execute()
 }
