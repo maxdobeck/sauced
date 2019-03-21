@@ -17,9 +17,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"time"
 
-	"github.com/fsnotify/fsnotify"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -33,15 +33,28 @@ var rootCmd = &cobra.Command{
 	Short: "Read from a YAML file at $HOME/.config/sauced.yaml and list the changes",
 	Long:  `First test to read and watch a YAML config file.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		scbinary := viper.GetString("sc-path")
+		scCmd := exec.Command(scbinary)
+		scOut, err := scCmd.Output()
+		if err != nil {
+			fmt.Println("Somethis is wrong with the sc binary: ", err)
+		}
+		fmt.Println(string(scOut))
+
 		tunnels := viper.Get("tunnels")
 		fmt.Println(tunnels)
 		for {
-			time.Sleep(4 * time.Second)
-			viper.OnConfigChange(func(e fsnotify.Event) {
-				tunnels := viper.Get("tunnels")
-				fmt.Println("Config file changed:", e.Name)
-				fmt.Println(tunnels)
-			})
+			time.Sleep(15 * time.Second)
+			tunnels := viper.GetStringMap("tunnels")
+			fmt.Println(tunnels)
+			for key, tunnel := range tunnels {
+				fmt.Println("Tunnel: ", key)
+				fmt.Println(tunnel)
+				// for _, arg := range tunnels[i] {
+				// 	fmt.Println(arg)
+				// }
+			}
+			fmt.Println(tunnels)
 		}
 	},
 }
