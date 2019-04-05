@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"time"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -34,28 +33,13 @@ var rootCmd = &cobra.Command{
 	Long:  `First test to read and watch a YAML config file.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		scbinary := viper.GetString("sc-path")
+		fmt.Println("Launching Sauce Connect Proxy binary at", scbinary)
 		scCmd := exec.Command(scbinary)
-		scOut, err := scCmd.Output()
+		err := scCmd.Start()
 		if err != nil {
-			fmt.Println("Somethis is wrong with the sc binary: ", err)
+			fmt.Println("Something went wrong with the sc binary! ", err)
 		}
-		fmt.Println(string(scOut))
-
-		tunnels := viper.Get("tunnels")
-		fmt.Println(tunnels)
-		for {
-			time.Sleep(15 * time.Second)
-			tunnels := viper.GetStringMap("tunnels")
-			fmt.Println(tunnels)
-			for key, tunnel := range tunnels {
-				fmt.Println("Tunnel: ", key)
-				fmt.Println(tunnel)
-				// for _, arg := range tunnels[i] {
-				// 	fmt.Println(arg)
-				// }
-			}
-			fmt.Println(tunnels)
-		}
+		fmt.Printf("Sauce Connect started as process %d.\n", scCmd.Process.Pid)
 	},
 }
 
@@ -111,4 +95,12 @@ func initConfig() {
 	} else {
 		fmt.Println("Problem reading config file:", err)
 	}
+
+	tunnels := viper.GetStringMap("tunnels")
+	for key, tunnel := range tunnels {
+		fmt.Println()
+		fmt.Println("Tunnel: ", key)
+		fmt.Println(tunnel)
+	}
+	fmt.Println()
 }
