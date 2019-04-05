@@ -15,9 +15,11 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -34,12 +36,29 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		scbinary := viper.GetString("sc-path")
 		fmt.Println("Launching Sauce Connect Proxy binary at", scbinary)
+
 		scCmd := exec.Command(scbinary)
+		stdout, _ := scCmd.StdoutPipe()
 		err := scCmd.Start()
 		if err != nil {
 			fmt.Println("Something went wrong with the sc binary! ", err)
 		}
+
 		fmt.Printf("Sauce Connect started as process %d.\n", scCmd.Process.Pid)
+		scanner := bufio.NewScanner(stdout)
+		scanner.Split(bufio.ScanLines)
+
+		for scanner.Scan() {
+			m := scanner.Text()
+			fmt.Println(m)
+			if strings.Contains(m, "Sauce Connect is up") {
+				fmt.Println("Sauce Connect started!  Killing it for you now so you don't forget!")
+				// can't send interrupts on Windows!! Beware, must use scCmd.Process.Kill
+				scCmd.Process.Signal(os.Interrupt)
+				break
+			}
+		}
+
 	},
 }
 
