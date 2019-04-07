@@ -56,7 +56,7 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -77,8 +77,10 @@ func initConfig() {
 		viper.AddConfigPath(home)
 		viper.AddConfigPath("$HOME/.config")
 		viper.AddConfigPath(home + "/.config")
+		//check for XDG_CONFIG_HOME somewhere in here
 		viper.SetConfigName("sauced")
-		viper.WatchConfig() // call this AFTER setting paths
+		// call this AFTER setting paths
+		viper.WatchConfig()
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
