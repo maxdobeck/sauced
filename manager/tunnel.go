@@ -38,7 +38,7 @@ func Start(binary string) error {
 }
 
 // ReadConfigs uses Viper to get a map of strings that constitute 1 or more tunnels
-func ReadConfigs(tunnels map[string]interface{}) {
+func ReadConfigs(tunnels map[string]string) {
 	for key, tunnel := range tunnels {
 		fmt.Println()
 		fmt.Println("Tunnel: ", key)

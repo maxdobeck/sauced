@@ -96,6 +96,6 @@ func initConfig() {
 		fmt.Println("Problem reading config file:", err)
 	}
 
-	tunnels := viper.GetStringMap("tunnels")
+	tunnels := viper.GetStringMapString("tunnels")
 	manager.ReadConfigs(tunnels)
 }
