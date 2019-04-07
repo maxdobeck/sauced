@@ -9,14 +9,15 @@ import (
 )
 
 // Start creates a new tunnel
-func Start(scPath string) {
-	fmt.Println("Launching Sauce Connect Proxy binary at", scPath)
+func Start(binary string) error {
+	fmt.Println("Launching Sauce Connect Proxy binary at", binary)
 
-	scCmd := exec.Command(scPath)
+	scCmd := exec.Command(binary)
 	stdout, _ := scCmd.StdoutPipe()
 	err := scCmd.Start()
 	if err != nil {
 		fmt.Println("Something went wrong with the sc binary! ", err)
+		return err
 	}
 
 	fmt.Printf("Sauce Connect started as process %d.\n", scCmd.Process.Pid)
@@ -33,10 +34,11 @@ func Start(scPath string) {
 			break
 		}
 	}
+	return nil
 }
 
 // ReadConfigs uses Viper to get a map of strings that constitute 1 or more tunnels
-func ReadConfigs(tunnels map[string]interface{}) {
+func ReadConfigs(tunnels map[string]string) {
 	for key, tunnel := range tunnels {
 		fmt.Println()
 		fmt.Println("Tunnel: ", key)
