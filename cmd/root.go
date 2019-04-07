@@ -15,12 +15,10 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-	"os/exec"
-	"strings"
 
+	"github.com/maxdobeck/sauced/manager"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -34,31 +32,8 @@ var rootCmd = &cobra.Command{
 	Short: "Read from a YAML file at $HOME/.config/sauced.yaml and list the changes",
 	Long:  `First test to read and watch a YAML config file.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		scbinary := viper.GetString("sc-path")
-		fmt.Println("Launching Sauce Connect Proxy binary at", scbinary)
-
-		scCmd := exec.Command(scbinary)
-		stdout, _ := scCmd.StdoutPipe()
-		err := scCmd.Start()
-		if err != nil {
-			fmt.Println("Something went wrong with the sc binary! ", err)
-		}
-
-		fmt.Printf("Sauce Connect started as process %d.\n", scCmd.Process.Pid)
-		scanner := bufio.NewScanner(stdout)
-		scanner.Split(bufio.ScanLines)
-
-		for scanner.Scan() {
-			m := scanner.Text()
-			fmt.Println(m)
-			if strings.Contains(m, "Sauce Connect is up") {
-				fmt.Println("Sauce Connect started!  Killing it for you now so you don't forget!")
-				// can't send interrupts on Windows!! Beware, must use scCmd.Process.Kill
-				scCmd.Process.Signal(os.Interrupt)
-				break
-			}
-		}
-
+		scPath := viper.GetString("sc-path")
+		manager.Start(scPath)
 	},
 }
 
@@ -116,10 +91,5 @@ func initConfig() {
 	}
 
 	tunnels := viper.GetStringMap("tunnels")
-	for key, tunnel := range tunnels {
-		fmt.Println()
-		fmt.Println("Tunnel: ", key)
-		fmt.Println(tunnel)
-	}
-	fmt.Println()
+	manager.ReadConfigs(tunnels)
 }
