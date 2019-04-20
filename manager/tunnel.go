@@ -14,7 +14,7 @@ func Start(launchArgs string) error {
 	tmp := strings.Split(launchArgs, " ")
 	path := tmp[0]
 
-	scCmd := exec.Command(path, launchArgs)
+	scCmd := exec.Command(strings.Trim(path, " "), launchArgs)
 	stdout, _ := scCmd.StdoutPipe()
 	err := scCmd.Start()
 	if err != nil {
@@ -28,7 +28,6 @@ func Start(launchArgs string) error {
 
 	for scanner.Scan() {
 		m := scanner.Text()
-		fmt.Println(m)
 		if strings.Contains(m, "Sauce Connect is up") {
 			fmt.Println("Sauce Connect started!  Killing it for you now so you don't forget!")
 			// can't send interrupts on Windows!! Beware, must use scCmd.Process.Kill
