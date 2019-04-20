@@ -17,6 +17,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/maxdobeck/sauced/manager"
 	"github.com/spf13/cobra"
@@ -30,17 +31,17 @@ var rootCmd = &cobra.Command{
 	Short: "Read from a YAML file at $HOME/.config/sauced.yaml and list the changes",
 	Long:  `First test to read and watch a YAML config file.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var wg sync.WaitGroup
 		// read in the sc startup commands
 		file, _ := os.Open(args[0])
 		fscanner := bufio.NewScanner(file)
 		for fscanner.Scan() {
 			if fscanner.Text() != "" {
-				err := manager.Start(fscanner.Text())
-				if err != nil {
-					fmt.Println("SC failed to start ", err)
-				}
+				wg.Add(1)
+				go manager.Start(fscanner.Text(), &wg)
 			}
 		}
+		wg.Wait()
 	},
 }
 

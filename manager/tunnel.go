@@ -6,11 +6,13 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 )
 
 // Start creates a new tunnel
-func Start(launchArgs string) error {
+func Start(launchArgs string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	tmp := strings.Split(launchArgs, " ")
 	path := tmp[0]
 
@@ -18,8 +20,7 @@ func Start(launchArgs string) error {
 	stdout, _ := scCmd.StdoutPipe()
 	err := scCmd.Start()
 	if err != nil {
-		fmt.Println("Something went wrong with the sc binary! ", err)
-		return err
+		fmt.Println("Something went wrong while starting the SC binary! ", err)
 	}
 
 	fmt.Printf("Sauce Connect started as process %d.\n", scCmd.Process.Pid)
@@ -34,7 +35,6 @@ func Start(launchArgs string) error {
 			Stop(scCmd.Process.Pid)
 		}
 	}
-	return nil
 }
 
 // Stop will halt a running process with SIGINT(CTRL-C)
