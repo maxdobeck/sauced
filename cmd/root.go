@@ -31,9 +31,11 @@ var rootCmd = &cobra.Command{
 	Short: "Read from a YAML file at $HOME/.config/sauced.yaml and list the changes",
 	Long:  `First test to read and watch a YAML config file.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		tunnels := viper.GetStringMap("tunnels")
-		target := manager.ParseConfigs(tunnels)
-		fmt.Println(target[0].Identifier)
+		userConfigs := viper.GetStringMap("tunnels")
+		target := manager.ParseConfigs(userConfigs)
+		gUser := viper.GetString("globalUser")
+		gKey := viper.GetString("globalKey")
+		manager.AddGlobalCreds(gUser, gKey, target)
 		// scBinary := viper.GetString("sc-path")
 		// err := manager.Start(scBinary)
 		// if err != nil {

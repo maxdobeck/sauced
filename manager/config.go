@@ -53,3 +53,22 @@ func ParseConfigs(tunnels map[string]interface{}) []Tunnel {
 	fmt.Println(target)
 	return target
 }
+
+// AddGlobalCreds takes in the globally specified user credentials
+// and adds them to all tunnels if no user/key combo is specified
+func AddGlobalCreds(user string, key string, tunnels []Tunnel) []Tunnel {
+	fmt.Println("Adding credentials where they are missing")
+	for _, tunnel := range tunnels {
+		if tunnel.User == "" {
+			tunnel.User = user
+		}
+		if tunnel.Key == "" {
+			tunnel.Key = key
+		}
+		fmt.Println(tunnel.Identifier)
+		fmt.Println(tunnel.User)
+		fmt.Println(tunnel.Key)
+		fmt.Println()
+	}
+	return tunnels
+}
