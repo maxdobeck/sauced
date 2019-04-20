@@ -1,5 +1,4 @@
-// Copyright © 2019 NAME HERE <EMAIL ADDRESS>
-//
+// Copyright © 2019
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -32,12 +31,15 @@ var rootCmd = &cobra.Command{
 	Short: "Read from a YAML file at $HOME/.config/sauced.yaml and list the changes",
 	Long:  `First test to read and watch a YAML config file.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		scBinary := viper.GetString("sc-path")
-		err := manager.Start(scBinary)
-		if err != nil {
-			fmt.Println("failed to start Sauce Connect tunnel here:", scBinary)
-			fmt.Println("due to an error:", err)
-		}
+		tunnels := viper.GetStringMap("tunnels")
+		target := manager.ParseConfigs(tunnels)
+		fmt.Println(target[0].Identifier)
+		// scBinary := viper.GetString("sc-path")
+		// err := manager.Start(scBinary)
+		// if err != nil {
+		// 	fmt.Println("failed to start Sauce Connect tunnel here:", scBinary)
+		// 	fmt.Println("due to an error:", err)
+		// }
 	},
 }
 
@@ -95,7 +97,4 @@ func initConfig() {
 	} else {
 		fmt.Println("Problem reading config file:", err)
 	}
-
-	tunnels := viper.GetStringMapString("tunnels")
-	manager.ReadConfigs(tunnels)
 }

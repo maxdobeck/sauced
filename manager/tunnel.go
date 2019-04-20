@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 // Start creates a new tunnel
@@ -30,19 +31,21 @@ func Start(binary string) error {
 		if strings.Contains(m, "Sauce Connect is up") {
 			fmt.Println("Sauce Connect started!  Killing it for you now so you don't forget!")
 			// can't send interrupts on Windows!! Beware, must use scCmd.Process.Kill
-			scCmd.Process.Signal(os.Interrupt)
-			break
+			Stop(scCmd.Process.Pid)
 		}
 	}
 	return nil
 }
-
-// ReadConfigs uses Viper to get a map of strings that constitute 1 or more tunnels
-func ReadConfigs(tunnels map[string]string) {
-	for key, tunnel := range tunnels {
-		fmt.Println()
-		fmt.Println("Tunnel: ", key)
-		fmt.Println(tunnel)
+// Stop will halt a running process with SIGINT(CTRL-C)
+func Stop(Pid int) {
+	tunnel, err := os.FindProcess(Pid)
+	if err != nil {
+		fmt.Printf("Process ID %d does not exist or could not be sent the SIGINT.", Pid)
+	} else {
+		time.Sleep(6 * time.Second)
+		err := tunnel.Signal(os.Interrupt)
+		if err != nil {
+			fmt.Println("Problem killing Process", Pid, err)
+		}
 	}
-	fmt.Println()
 }
