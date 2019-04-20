@@ -10,10 +10,11 @@ import (
 )
 
 // Start creates a new tunnel
-func Start(binary string) error {
-	fmt.Println("Launching Sauce Connect Proxy binary at", binary)
+func Start(launchArgs string) error {
+	tmp := strings.Split(launchArgs, " ")
+	path := tmp[0]
 
-	scCmd := exec.Command(binary)
+	scCmd := exec.Command(path, launchArgs)
 	stdout, _ := scCmd.StdoutPipe()
 	err := scCmd.Start()
 	if err != nil {
@@ -36,6 +37,7 @@ func Start(binary string) error {
 	}
 	return nil
 }
+
 // Stop will halt a running process with SIGINT(CTRL-C)
 func Stop(Pid int) {
 	tunnel, err := os.FindProcess(Pid)
