@@ -15,7 +15,7 @@ type Tunnel struct {
 }
 
 // ParseConfigs to get an array that constitutes 1 or more tunnels
-func ParseConfigs(tunnels map[string]interface{}) {
+func ParseConfigs(tunnels map[string]interface{}) []Tunnel {
 	var target []Tunnel
 	fmt.Println(tunnels)
 	for key, tunnel := range tunnels {
@@ -51,4 +51,5 @@ func ParseConfigs(tunnels map[string]interface{}) {
 	}
 	fmt.Println()
 	fmt.Println(target)
+	return target
 }
