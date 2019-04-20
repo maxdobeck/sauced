@@ -36,7 +36,6 @@ func Start(binary string) error {
 	}
 	return nil
 }
-
 // Stop will halt a running process with SIGINT(CTRL-C)
 func Stop(Pid int) {
 	tunnel, err := os.FindProcess(Pid)
