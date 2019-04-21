@@ -19,11 +19,10 @@ import (
 	"os"
 	"sync"
 
+	"github.com/maxdobeck/sauced/logger"
 	"github.com/maxdobeck/sauced/manager"
 	"github.com/spf13/cobra"
 )
-
-var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -31,6 +30,13 @@ var rootCmd = &cobra.Command{
 	Short: "Read from a YAML file at $HOME/.config/sauced.yaml and list the changes",
 	Long:  `First test to read and watch a YAML config file.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Get logfile
+		logfile, err := cmd.Flags().GetString("logfile")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving logfile flag", err)
+		}
+		logger.SetupLogfile(logfile)
+
 		var wg sync.WaitGroup
 		// read in the sc startup commands
 		file, _ := os.Open(args[0])
@@ -59,6 +65,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/sauced.yaml)")
+	rootCmd.PersistentFlags().StringP("logfile", "l", "/tmp/sauced.log", "logfile for meta-status output (default is /tmp/sauced.log)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
