@@ -13,10 +13,10 @@ import (
 // Start creates a new tunnel
 func Start(launchArgs string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	tmp := strings.Split(launchArgs, " ")
-	path := tmp[0]
+	args := strings.Split(launchArgs, " ")
+	path := args[0]
 
-	scCmd := exec.Command(strings.Trim(path, " "), launchArgs)
+	scCmd := exec.Command(path, args[1:]...)
 	stdout, _ := scCmd.StdoutPipe()
 	err := scCmd.Start()
 	if err != nil {
@@ -29,6 +29,7 @@ func Start(launchArgs string, wg *sync.WaitGroup) {
 
 	for scanner.Scan() {
 		m := scanner.Text()
+		fmt.Println(m)
 		if strings.Contains(m, "Sauce Connect is up") {
 			fmt.Println("Sauce Connect started!  Killing it for you now so you don't forget!")
 			// can't send interrupts on Windows!! Beware, must use scCmd.Process.Kill
