@@ -2,13 +2,19 @@
 Managed Sauce Connect tunnels.
 
 ## Install and Run
-1. `go get github.com/maxdobeck/sauced`
+`go get github.com/maxdobeck/sauced`
+
 or
-2. Clone the repo and put it in `$GOPATH/github.com/maxdobeck/sauced`.
+
+Clone the repo and put it in `$GOPATH/github.com/maxdobeck/sauced`.
+
+Create your config file.
+
+Run like `$ ./sauced ~/.config/config.txt`
 
 Move to the directory and run `$ go build`.  Run the binary like `./sauced`.  `.\sauced` on windows.  Be aware of other windows specific behavior like %GOPATH% instead of $GOPATH.
 
-Pass in the config file like so `$ ./sauced ~/.config/sauced.txt`.  The specified file should be read line by line and used to start a Sauce Connect instance.  
+Pass in the config file like so `$ ./sauced ~/.config/sauced.txt`.  The specified file should be read line by line and used to start a Sauce Connect instance.
 
 ## Config File
 The config file should have one line for each SC instance.  The first portion of the line should be the path to the SC binary you want to use.  The other arguments should be the flags you would use if you were starting the tunnel manually from a command line.  The scheme should be:
