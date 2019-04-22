@@ -1,20 +1,47 @@
 package manager
 
 import (
+	"encoding/json"
 	"github.com/maxdobeck/sauced/logger"
+	"io/ioutil"
 	"os"
+	"time"
 )
+
+// LastKnownTunnels will a json object with
+// all tunnels that were previously known to be alive
+type LastKnownTunnels struct {
+	Tunnels []TunnelState `json:"tunnels"`
+}
 
 // TunnelState is a json representation
 // of the a tunnel as an OS process after it has launched
 type TunnelState struct {
-	PID      int
-	SCBinary string
-	Args     string
-	Launch   string
+	PID        int       `json:"pid"`
+	SCBinary   string    `json:"scbinary"`
+	Args       string    `json:"args"`
+	LaunchTime time.Time `json:"launchtime"`
 }
 
-func createIPCFile() *os.File {
+// AddTunnel will record the state of the tunnel
+// to the IPC file after the tunnel has launched as an OS process
+func AddTunnel(launchArgs string, path string, PID int) {
+	fp := getIPCFile()
+	defer fp.Close()
+	var tunnels LastKnownTunnels
+
+	tun := TunnelState{PID, path, launchArgs, time.Now().UTC()}
+
+	rawValue, _ := ioutil.ReadAll(fp)
+	if rawValue == nil {
+		// start a new TunnelState list, marshall the json, and write it to file
+	} else {
+		json.Unmarshal(rawValue, &tunnels)
+		tunnels.Tunnels = append(tunnels.Tunnels, tun)
+	}
+}
+
+func getIPCFile() *os.File {
 	if _, err := os.Stat("/tmp/sauced-state.json"); err == nil {
 		logger.Disklog.Debug("Found state file /tmp/sauced-state.json")
 		// ADD sauced LOG ROTATION HERE

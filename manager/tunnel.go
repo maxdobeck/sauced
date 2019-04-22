@@ -50,7 +50,7 @@ func Stop(Pid int) {
 		time.Sleep(6 * time.Second)
 		err := tunnel.Signal(os.Interrupt)
 		if err != nil {
-			logger.Disklog.Warnf("Problem killing Process", Pid, err)
+			logger.Disklog.Warnf("Problem killing Process %d %v", Pid, err)
 		}
 	}
 }
