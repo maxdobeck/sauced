@@ -14,16 +14,15 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"sync"
 
+	"github.com/maxdobeck/sauced/logger"
 	"github.com/maxdobeck/sauced/manager"
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
-
-var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -31,15 +30,24 @@ var rootCmd = &cobra.Command{
 	Short: "Read from a YAML file at $HOME/.config/sauced.yaml and list the changes",
 	Long:  `First test to read and watch a YAML config file.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		tunnels := viper.GetStringMap("tunnels")
-		target := manager.ParseConfigs(tunnels)
-		fmt.Println(target[0].Identifier)
-		// scBinary := viper.GetString("sc-path")
-		// err := manager.Start(scBinary)
-		// if err != nil {
-		// 	fmt.Println("failed to start Sauce Connect tunnel here:", scBinary)
-		// 	fmt.Println("due to an error:", err)
-		// }
+		// Get logfile
+		logfile, err := cmd.Flags().GetString("logfile")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving logfile flag", err)
+		}
+		logger.SetupLogfile(logfile)
+
+		var wg sync.WaitGroup
+		// read in the sc startup commands
+		file, _ := os.Open(args[0])
+		fscanner := bufio.NewScanner(file)
+		for fscanner.Scan() {
+			if fscanner.Text() != "" {
+				wg.Add(1)
+				go manager.Start(fscanner.Text(), &wg)
+			}
+		}
+		wg.Wait()
 	},
 }
 
@@ -53,48 +61,13 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/sauced.yaml)")
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/sauced.yaml)")
+	rootCmd.PersistentFlags().StringP("logfile", "l", "/tmp/sauced.log", "logfile for meta-status output (default is /tmp/sauced.log)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		// Search config in home directory with name ".sauced" (without extension).
-		viper.SetConfigType("yaml")
-		viper.AddConfigPath(home)
-		viper.AddConfigPath("$HOME/.config")
-		viper.AddConfigPath(home + "/.config")
-		//check for XDG_CONFIG_HOME somewhere in here
-		viper.SetConfigName("sauced")
-		// call this AFTER setting paths
-		viper.WatchConfig()
-	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	} else {
-		fmt.Println("Problem reading config file:", err)
-	}
 }
