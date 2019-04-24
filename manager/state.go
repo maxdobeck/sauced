@@ -100,6 +100,22 @@ func PruneState() {
 	}
 }
 
+// ShowState will list all the known tunnels
+func ShowState() {
+	last := getLastKnownState()
+	logger.Disklog.Info(last)
+}
+
+// ShowStateJSON will pretty print JSON
+func ShowStateJSON() {
+	last := getLastKnownState()
+	lastJSON, err := json.MarshalIndent(last, "", "    ")
+	if err != nil {
+		logger.Disklog.Warnf("Could not format JSON with Indents: %v", err)
+	}
+	logger.Disklog.Info(string(lastJSON))
+}
+
 func getLastKnownState() LastKnownTunnels {
 	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
 	if err != nil {
