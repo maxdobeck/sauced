@@ -27,14 +27,13 @@ import (
 // startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Start all tunnels listed in your config file you reference.",
+	Long:  `Start all tunnels in the config file you reference like $ sauced start ~/my-config.txt`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) < 1 {
+			logger.Disklog.Warn("You did not specify a config file!  Please write a .txt file and pass it in like $ sauced start /path/to/config.txt")
+			os.Exit(1)
+		}
 		// Get logfile
 		logfile, err := cmd.Flags().GetString("logfile")
 		if err != nil {
