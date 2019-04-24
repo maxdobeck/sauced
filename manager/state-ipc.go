@@ -5,6 +5,7 @@ import (
 	"github.com/maxdobeck/sauced/logger"
 	"io/ioutil"
 	"os"
+	"syscall"
 	"time"
 )
 
@@ -15,7 +16,7 @@ type LastKnownTunnels struct {
 }
 
 // TunnelState is a json representation
-// of the a tunnel as an OS process after it has launched
+// of an OS process after SC has launched
 type TunnelState struct {
 	PID        int       `json:"pid"`
 	SCBinary   string    `json:"scbinary"`
@@ -26,41 +27,101 @@ type TunnelState struct {
 // AddTunnel will record the state of the tunnel
 // to the IPC file after the tunnel has launched as an OS process
 func AddTunnel(launchArgs string, path string, PID int) {
-	fp := getIPCFile()
-	defer fp.Close()
-	var tunnels LastKnownTunnels
+	createIPCFile()
 
+	var tunnelsState LastKnownTunnels
 	tun := TunnelState{PID, path, launchArgs, time.Now().UTC()}
 
-	rawValue, _ := ioutil.ReadAll(fp)
+	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
+	if err != nil {
+		logger.Disklog.Warn("Could not read from statefile: ", err)
+	}
 	if rawValue == nil {
-		// start a new TunnelState list, marshall the json, and write it to file
+		tunnelsState.Tunnels = append(tunnelsState.Tunnels, tun)
 	} else {
-		json.Unmarshal(rawValue, &tunnels)
-		tunnels.Tunnels = append(tunnels.Tunnels, tun)
+		json.Unmarshal(rawValue, &tunnelsState)
+		tunnelsState.Tunnels = append(tunnelsState.Tunnels, tun)
+	}
+
+	tunnelStateJSON, err := json.Marshal(tunnelsState)
+	if err != nil {
+		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
+	}
+	err = ioutil.WriteFile("/tmp/sauced-state.json", tunnelStateJSON, 0755)
+	if err != nil {
+		logger.Disklog.Warn("Could not write the tunnel state data to the JSON file: ", err)
 	}
 }
 
-func getIPCFile() *os.File {
+// RemoveTunnel deletes a tunnel entry from the
+// Last Known Tunnel object
+func RemoveTunnel(targetPID int) {
+	last := getLastKnownState()
+	for i := 0; i < len(last.Tunnels); i++ {
+		tunnel := last.Tunnels[i]
+		if tunnel.PID == targetPID {
+			last.Tunnels = append(last.Tunnels[:i], last.Tunnels[i+1:]...)
+			break
+		}
+	}
+	tunnelStateJSON, err := json.Marshal(last)
+	if err != nil {
+		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
+	}
+	err = ioutil.WriteFile("/tmp/sauced-state.json", tunnelStateJSON, 0755)
+	if err != nil {
+		logger.Disklog.Warn("Could not write the tunnel state data to the JSON file: ", err)
+	}
+}
+
+// PruneState will access the state file and
+// remove any entries that are not found by the OS
+func PruneState() {
+	last := getLastKnownState()
+	for i := 0; i < len(last.Tunnels); i++ {
+		tunnel := last.Tunnels[i]
+		proc, _ := os.FindProcess(tunnel.PID)
+		syscallErr := proc.Signal(syscall.Signal(0))
+		if syscallErr != nil {
+			// take everything to the left of i, then conjoin it w/ everything to the right of i
+			last.Tunnels = append(last.Tunnels[:i], last.Tunnels[i+1:]...)
+			// decrement our for loop scope so we don't go out of bounds
+			i--
+			logger.Disklog.Infof("Found dead tunnel.  Removing from statefile: %v", tunnel)
+		}
+	}
+	tunnelStateJSON, err := json.Marshal(last)
+	if err != nil {
+		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
+	}
+	err = ioutil.WriteFile("/tmp/sauced-state.json", tunnelStateJSON, 0755)
+	if err != nil {
+		logger.Disklog.Warn("Could not write the tunnel state data to the JSON file: ", err)
+	}
+}
+
+func getLastKnownState() LastKnownTunnels {
+	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
+	if err != nil {
+		logger.Disklog.Warn("Could notget last known state from file: ", err)
+	}
+	var tunnelsState LastKnownTunnels
+
+	json.Unmarshal(rawValue, &tunnelsState)
+	return tunnelsState
+}
+
+func createIPCFile() {
 	if _, err := os.Stat("/tmp/sauced-state.json"); err == nil {
 		logger.Disklog.Debug("Found state file /tmp/sauced-state.json")
-		// ADD sauced LOG ROTATION HERE
-		file, err := os.OpenFile("/tmp/sauced-state.json", os.O_CREATE|os.O_WRONLY, 0666)
-		if err != nil {
-			logger.Disklog.Warn("Failed to open /tmp/sauced-state.json")
-			return nil
-		}
-		return file
 	} else if os.IsNotExist(err) {
 		logger.Disklog.Info("/tmp/sauced-state.json not found ", err)
-		file, err := os.OpenFile("/tmp/sauced-state.json", os.O_CREATE|os.O_WRONLY, 0666)
+		file, err := os.OpenFile("/tmp/sauced-state.json", os.O_CREATE|os.O_WRONLY, 0755)
 		if err != nil {
 			logger.Disklog.Warn("Failed to open /tmp/sauced-state.json")
-			return nil
 		}
-		return file
+		defer file.Close()
 	} else {
-		logger.Disklog.Warn("unable to obtain a pointer to /tmp/sauced-state.json")
-		return nil
+		logger.Disklog.Warn("unable to find /tmp/sauced-state.json")
 	}
 }

@@ -37,6 +37,8 @@ var rootCmd = &cobra.Command{
 		}
 		logger.SetupLogfile(logfile)
 
+		manager.PruneState()
+
 		var wg sync.WaitGroup
 		// read in the sc startup commands
 		file, _ := os.Open(args[0])
