@@ -19,7 +19,7 @@ func SetupLogfile(logfile string) {
 	if _, err := os.Stat(logfile); err == nil {
 		Disklog.Debug("Found logfile: ", logfile)
 		// ADD sauced LOG ROTATION HERE
-		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY, 0666)
+		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
 			log.Info("Failed to log to file, using default stdout")
 		} else {
@@ -28,7 +28,7 @@ func SetupLogfile(logfile string) {
 		}
 	} else if os.IsNotExist(err) {
 		log.Info(logfile, " NOT found: ", err)
-		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY, 0666)
+		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
 			log.Info("Failed to log to file, using default stderr")
 		} else {
