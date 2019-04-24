@@ -3,6 +3,7 @@ package manager
 import (
 	"sync"
 	"testing"
+	"time"
 )
 
 // TestSCStarts will start a sc tunnel if the $SAUCE_USERNAME and $SAUCE_ACCESS_KEY environment variables are set with valid data
@@ -12,5 +13,6 @@ func TestSCStarts(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go Start(scBinary, &wg)
-	wg.Wait()
+	time.Sleep(10 * time.Second)
+	StopAll()
 }
