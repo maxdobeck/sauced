@@ -23,8 +23,11 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "sauced",
-	Short: "Read from a YAML file at $HOME/.config/sauced.yaml and list the changes",
-	Long:  `First test to read and watch a YAML config file.`,
+	Short: "Read from a config file at and start some tunnels.",
+	Long: `Will read from a user specified config file and start tunnels as they appear.
+Each tunnel should be on one line and separated by a newline character.  Use the start cmd
+to start all the specified tunnels.  Stop cmd will stop all tunnels that were started by the
+program.`,
 	// Run: func(cmd *cobra.Command, args []string) {
 	// },
 }
@@ -43,7 +46,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/sauced.yaml)")
-	rootCmd.PersistentFlags().StringP("logfile", "l", "/tmp/sauced.log", "logfile for meta-status output (default is /tmp/sauced.log)")
+	rootCmd.PersistentFlags().StringP("logfile", "l", "/tmp/sauced.log", "logfile for meta-status output")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
