@@ -1,26 +1,22 @@
 package manager
 
-// Target is the collection of items that
+// Metadata is the collection of items that
 // make a tunnel unique and part of a pool
-type Target struct {
+type Metadata struct {
 	Hash byte
 	Pool string
 	Size int
 	User string
 }
 
-func pooler() {
+// Hasher takes in the launch args from the
+// config to produce a unique hash representing the tunnel or pool
+func hasher() {
 
 }
 
-// Hasher generates a hash for the tunnel
-// based on the launch arguments in the config
-func Hasher() {
-
-}
-
-// SetTarget assembles a list of Targets
+// SetMetadata assembles a list of Targets
 // based on the config file
-func SetTarget() {
+func SetMetadata() {
 
 }

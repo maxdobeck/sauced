@@ -22,6 +22,7 @@ type TunnelState struct {
 	SCBinary   string    `json:"scbinary"`
 	Args       string    `json:"args"`
 	LaunchTime time.Time `json:"launchtime"`
+	Metadata   Metadata  `json:"metadata"`
 }
 
 // AddTunnel will record the state of the tunnel
@@ -30,7 +31,7 @@ func AddTunnel(launchArgs string, path string, PID int) {
 	createIPCFile()
 
 	var tunnelsState LastKnownTunnels
-	tun := TunnelState{PID, path, launchArgs, time.Now().UTC()}
+	tun := TunnelState{PID, path, launchArgs, time.Now().UTC(), Metadata{}}
 
 	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
 	if err != nil {
