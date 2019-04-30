@@ -23,10 +23,13 @@ func Start(launchArgs string, wg *sync.WaitGroup) {
 	stdout, _ := scCmd.StdoutPipe()
 	err := scCmd.Start()
 	if err != nil {
-		logger.Disklog.Fatal("Something went wrong while starting the SC binary! ", err)
+		logger.Disklog.Warnf("Something went wrong while starting the SC binary! %v", err)
+		if _, fileProblem := os.Stat(launchArgs); fileProblem != nil {
+			logger.Disklog.Warnf("Could not use this binary -> '%s' because it does not exist: %v", launchArgs, fileProblem)
+		}
 	}
 
-	logger.Disklog.Infof("Sauce Connect started as process %d.\n", scCmd.Process.Pid)
+	logger.Disklog.Infof("Tunnel started as process %d - %s\n", scCmd.Process.Pid, launchArgs)
 	scanner := bufio.NewScanner(stdout)
 	scanner.Split(bufio.ScanLines)
 
@@ -34,15 +37,12 @@ func Start(launchArgs string, wg *sync.WaitGroup) {
 		m := scanner.Text()
 		if strings.Contains(m, "Sauce Connect is up") {
 			AddTunnel(launchArgs, path, scCmd.Process.Pid)
-			// logger.Disklog.Infof("Sauce Connect started! These arguments launched with success: %s Killing it for you now so you don't forget!", launchArgs)
-			// // can't send interrupts on Windows!! Beware, must use scCmd.Process.Kill
-			// Stop(scCmd.Process.Pid)
-			// RemoveTunnel(scCmd.Process.Pid)
 		}
 		if strings.Contains(m, "Log file:") {
 			logger.Disklog.Infof("Tunnel log started for tunnel: %s \n %s", launchArgs, m)
 		}
 	}
+	logger.Disklog.Infof("Tunnel logfile closed")
 }
 
 // Stop will halt a running process with SIGINT(CTRL-C)

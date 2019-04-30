@@ -48,7 +48,7 @@ var startCmd = &cobra.Command{
 		file, _ := os.Open(args[0])
 		fscanner := bufio.NewScanner(file)
 		for fscanner.Scan() {
-			if fscanner.Text() != "" {
+			if fscanner.Text() != "" || len(fscanner.Text()) != 0 {
 				wg.Add(1)
 				go manager.Start(fscanner.Text(), &wg)
 			}
