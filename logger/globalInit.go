@@ -27,13 +27,13 @@ func SetupLogfile(logfile string) {
 			Disklog.Info("Started program and now writing to file.")
 		}
 	} else if os.IsNotExist(err) {
-		log.Info(logfile, " NOT found: ", err)
+		log.Debug(logfile, " NOT found: ", err)
 		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
 			log.Info("Failed to log to file, using default stderr")
 		} else {
 			Disklog.Out = file
-			Disklog.Info("Started program and now writing to file.")
+			Disklog.Infof("Started program and now writing to %s.", logfile)
 		}
 	} else {
 		log.Warn("unable to set the logfile to", logfile)
