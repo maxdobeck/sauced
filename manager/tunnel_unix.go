@@ -66,6 +66,5 @@ func StopAll() {
 	last := getLastKnownState()
 	for _, tunnel := range last.Tunnels {
 		Stop(tunnel.PID)
-		RemoveTunnel(tunnel.PID)
 	}
 }
