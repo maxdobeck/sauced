@@ -13,12 +13,11 @@ var Disklog = log.New()
 // and attempt to create a logfile if one does not exist
 func SetupLogfile(logfile string) {
 	Disklog.SetFormatter(&log.TextFormatter{})
-	Disklog.SetLevel(log.DebugLevel)
+	Disklog.SetLevel(log.InfoLevel)
 	Disklog.Out = os.Stdout
 	Disklog.Info("Looking for logfile: ", logfile)
 	if _, err := os.Stat(logfile); err == nil {
-		Disklog.Debug("Found logfile: ", logfile)
-		// ADD sauced LOG ROTATION HERE
+		Disklog.Info("Using existing file: ", logfile)
 		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
 			log.Info("Failed to log to file, using default stdout")
