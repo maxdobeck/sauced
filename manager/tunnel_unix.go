@@ -24,9 +24,7 @@ func Start(launchArgs string, wg *sync.WaitGroup) {
 	err := scCmd.Start()
 	if err != nil {
 		logger.Disklog.Warnf("Something went wrong while starting the SC binary! %v", err)
-		if _, fileProblem := os.Stat(launchArgs); fileProblem != nil {
-			logger.Disklog.Warnf("Could not use this binary -> '%s' because it does not exist: %v", launchArgs, fileProblem)
-		}
+		return
 	}
 
 	logger.Disklog.Infof("Tunnel started as process %d - %s\n", scCmd.Process.Pid, launchArgs)
