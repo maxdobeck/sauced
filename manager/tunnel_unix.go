@@ -14,7 +14,7 @@ import (
 )
 
 // Start creates a new tunnel
-func Start(launchArgs string, wg *sync.WaitGroup) {
+func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 	defer wg.Done()
 	args := strings.Split(launchArgs, " ")
 	path := args[0]
@@ -34,7 +34,7 @@ func Start(launchArgs string, wg *sync.WaitGroup) {
 	for scanner.Scan() {
 		m := scanner.Text()
 		if strings.Contains(m, "Sauce Connect is up") {
-			AddTunnel(launchArgs, path, scCmd.Process.Pid)
+			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta)
 		}
 		if strings.Contains(m, "Log file:") {
 			logger.Disklog.Infof("Tunnel log started for tunnel: %s \n %s", launchArgs, m)

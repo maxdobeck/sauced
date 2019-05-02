@@ -34,6 +34,7 @@ var startCmd = &cobra.Command{
 			logger.Disklog.Warn("You did not specify a config file!  Please write a .txt file and pass it in like $ sauced start /path/to/config.txt")
 			os.Exit(1)
 		}
+		configFile := args[0]
 		// Get logfile
 		logfile, err := cmd.Flags().GetString("logfile")
 		if err != nil {
@@ -42,15 +43,18 @@ var startCmd = &cobra.Command{
 		logger.SetupLogfile(logfile)
 
 		manager.PruneState()
+		meta := manager.CollectMetadata(configFile)
+		manager.UpdateState(meta)
 
 		var wg sync.WaitGroup
 		// read in the sc startup commands
-		file, _ := os.Open(args[0])
+		file, _ := os.Open(configFile)
 		fscanner := bufio.NewScanner(file)
 		for fscanner.Scan() {
 			if fscanner.Text() != "" || len(fscanner.Text()) != 0 {
 				wg.Add(1)
-				go manager.Start(fscanner.Text(), &wg)
+				pool := manager.PoolName(fscanner.Text())
+				go manager.Start(fscanner.Text(), &wg, meta[pool])
 			}
 		}
 		wg.Wait()

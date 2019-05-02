@@ -16,7 +16,7 @@ func TestSCStarts(t *testing.T) {
 	scBinary := "/home/max/workspace/tools/sc-4.5.1-linux/bin/sc"
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go Start(scBinary, &wg)
+	go Start(scBinary, &wg, Metadata{})
 	time.Sleep(5 * time.Second)
 	StopAll()
 }
@@ -26,7 +26,7 @@ func TestSCFailsOnBadInput(t *testing.T) {
 	scBinary := "/some/fake/path"
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go Start(scBinary, &wg)
+	go Start(scBinary, &wg, Metadata{})
 	tunnels := getLastKnownState()
 	if len(tunnels.Tunnels) != 0 {
 		t.Fail()

@@ -27,11 +27,11 @@ type TunnelState struct {
 
 // AddTunnel will record the state of the tunnel
 // to the IPC file after the tunnel has launched as an OS process
-func AddTunnel(launchArgs string, path string, PID int) {
+func AddTunnel(launchArgs string, path string, PID int, meta Metadata) {
 	createIPCFile()
 
 	var tunnelsState LastKnownTunnels
-	tun := TunnelState{PID, path, launchArgs, time.Now().UTC(), Metadata{}}
+	tun := TunnelState{PID, path, launchArgs, time.Now().UTC(), meta}
 
 	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
 	if err != nil {
@@ -99,6 +99,14 @@ func PruneState() {
 	if err != nil {
 		logger.Disklog.Warn("Could not write the tunnel state data to the JSON file: ", err)
 	}
+}
+
+// UpdateState uses the derived metadata
+// to correct and update the statefile
+func UpdateState(newMeta map[string]Metadata) {
+	newState := getLastKnownState()
+	// loop through the lastknownstate and update the .metadata based on the newMeta.
+	// commit to the statefile
 }
 
 // ShowState will list all the known tunnels
