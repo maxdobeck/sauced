@@ -53,7 +53,9 @@ var startCmd = &cobra.Command{
 		for fscanner.Scan() {
 			if fscanner.Text() != "" || len(fscanner.Text()) != 0 {
 				wg.Add(1)
-				pool := manager.PoolName(fscanner.Text())
+				message := make(chan string)
+				manager.PoolName(fscanner.Text(), message)
+				pool := <-message
 				go manager.Start(fscanner.Text(), &wg, meta[pool])
 			}
 		}

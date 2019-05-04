@@ -2,11 +2,12 @@ package manager
 
 import (
 	"encoding/json"
-	"github.com/maxdobeck/sauced/logger"
 	"io/ioutil"
 	"os"
 	"syscall"
 	"time"
+
+	"github.com/maxdobeck/sauced/logger"
 )
 
 // LastKnownTunnels will a json object with
@@ -104,7 +105,7 @@ func PruneState() {
 // UpdateState uses the derived metadata
 // to correct and update the statefile
 func UpdateState(newMeta map[string]Metadata) {
-	newState := getLastKnownState()
+	//newState := getLastKnownState()
 	// loop through the lastknownstate and update the .metadata based on the newMeta.
 	// commit to the statefile
 }
