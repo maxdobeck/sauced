@@ -2,9 +2,10 @@ package manager
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strings"
+
+	"github.com/maxdobeck/sauced/logger"
 )
 
 // Metadata is the collection of items that
@@ -18,7 +19,7 @@ type Metadata struct {
 // CollectMetadata parses the config file for important
 // data points and returns the formatted metadata
 func CollectMetadata(config string) map[string]Metadata {
-	fmt.Println("Starting to collect metadata!")
+	logger.Disklog.Infof("Started collecting metadata from %s", config)
 	meta := make(map[string]Metadata)
 	file, _ := os.Open(config)
 	fscanner := bufio.NewScanner(file)
@@ -32,9 +33,13 @@ func CollectMetadata(config string) map[string]Metadata {
 			// silently return and fail if getOwner() fails
 			tunnelName := <-pool
 			username := <-owner
-			fmt.Println(tunnelName, username)
 
-			// then append to the metadata map.  And increment the Size
+			// then add to the metadata map.  And increment the Size as needed
+			if val, ok := meta[tunnelName]; ok {
+				val.Size = val.Size + 1
+			} else {
+				val = Metadata{Size: 1, Pool: tunnelName, Owner: username}
+			}
 		}
 	}
 	return meta
@@ -47,7 +52,6 @@ func PoolName(launchArgs string, pool chan string) {
 	args := strings.Split(launchArgs, " ")
 	for index, arg := range args {
 		if arg == "-i" {
-			fmt.Println("Pool Name", args[index+1])
 			pool <- args[index+1]
 		}
 	}
@@ -60,9 +64,8 @@ func getOwner(launchArgs string, owner chan string) {
 	args := strings.Split(launchArgs, " ")
 	for index, arg := range args {
 		if arg == "-u" {
-			fmt.Println("Owner Username", args[index+1])
 			owner <- args[index+1]
 		}
 	}
-	owner <- "none"
+	owner <- "not found"
 }
