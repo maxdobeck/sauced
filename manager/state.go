@@ -13,26 +13,31 @@ import (
 // LastKnownTunnels will a json object with
 // all tunnels that were previously known to be alive
 type LastKnownTunnels struct {
-	Tunnels []TunnelState `json:"tunnels"`
+	Tunnels []Tunnel `json:"tunnels"`
 }
 
-// TunnelState is a json representation
+// Tunnel is a json representation
 // of an OS process after SC has launched
-type TunnelState struct {
+type Tunnel struct {
 	PID        int       `json:"pid"`
 	SCBinary   string    `json:"scbinary"`
 	Args       string    `json:"args"`
 	LaunchTime time.Time `json:"launchtime"`
+	Log        string    `json:"log"`
 	Metadata   Metadata  `json:"metadata"`
+}
+
+func (tun Tunnel) rotateLog() error {
+	return nil
 }
 
 // AddTunnel will record the state of the tunnel
 // to the IPC file after the tunnel has launched as an OS process
-func AddTunnel(launchArgs string, path string, PID int, meta Metadata) {
+func AddTunnel(launchArgs string, path string, PID int, meta Metadata, tunnelLog string) {
 	createIPCFile()
 
 	var tunnelsState LastKnownTunnels
-	tun := TunnelState{PID, path, launchArgs, time.Now().UTC(), meta}
+	tun := Tunnel{PID, path, launchArgs, time.Now().UTC(), tunnelLog, meta}
 
 	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
 	if err != nil {

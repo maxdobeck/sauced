@@ -31,13 +31,16 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 	scanner := bufio.NewScanner(stdout)
 	scanner.Split(bufio.ScanLines)
 
+	var tunLog string
 	for scanner.Scan() {
 		m := scanner.Text()
-		if strings.Contains(m, "Sauce Connect is up") {
-			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta)
-		}
 		if strings.Contains(m, "Log file:") {
+			ll := strings.Split(m, " ")
+			tunLog = ll[len(ll)-1]
 			logger.Disklog.Infof("Tunnel log started for tunnel: %s \n %s", launchArgs, m)
+		}
+		if strings.Contains(m, "Sauce Connect is up") {
+			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta, tunLog)
 		}
 	}
 	logger.Disklog.Debugf("Tunnel %s closed", launchArgs)
