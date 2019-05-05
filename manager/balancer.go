@@ -30,8 +30,9 @@ func CollectMetadata(config string) map[string]Metadata {
 			go getOwner(fscanner.Text(), owner)
 			// use channels here to wait for the string data to return
 			// silently return and fail if getOwner() fails
-			name := <-pool
+			tunnelName := <-pool
 			username := <-owner
+			fmt.Println(tunnelName, username)
 
 			// then append to the metadata map.  And increment the Size
 		}

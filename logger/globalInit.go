@@ -1,8 +1,9 @@
 package logger
 
 import (
-	log "github.com/sirupsen/logrus"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Disklog logs to disk w/ this instance.  Logfile
@@ -13,7 +14,7 @@ var Disklog = log.New()
 // and attempt to create a logfile if one does not exist
 func SetupLogfile(logfile string) {
 	Disklog.SetFormatter(&log.TextFormatter{})
-	Disklog.SetLevel(log.InfoLevel)
+	Disklog.SetLevel(log.DebugLevel)
 	Disklog.Out = os.Stdout
 	Disklog.Info("Looking for logfile: ", logfile)
 	if _, err := os.Stat(logfile); err == nil {
@@ -23,7 +24,7 @@ func SetupLogfile(logfile string) {
 			log.Info("Failed to log to file, using default stdout")
 		} else {
 			Disklog.Out = file
-			Disklog.Info("Started program and now writing to file.")
+			Disklog.Info("Started program and now writing to ", logfile)
 		}
 	} else if os.IsNotExist(err) {
 		log.Debug(logfile, " NOT found: ", err)

@@ -103,7 +103,7 @@ func PruneState() {
 }
 
 // UpdateState uses the derived metadata
-// to correct and update the statefile
+// to correct the statefile
 func UpdateState(newMeta map[string]Metadata) {
 	//newState := getLastKnownState()
 	// loop through the lastknownstate and update the .metadata based on the newMeta.
