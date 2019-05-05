@@ -107,10 +107,17 @@ func PruneState() {
 func UpdateState(newMeta map[string]Metadata) {
 	newState := getLastKnownState()
 	// loop through the lastknownstate and update the .metadata based on the newMeta.
-	for _, tunnel := range newState.Tunnels {
-		tunnel.Metadata = newMeta[tunnel.Metadata.Pool]
+	for index, tunnel := range newState.Tunnels {
+		oldMeta := tunnel.Metadata
+		if val, ok := newMeta[tunnel.Metadata.Pool]; ok {
+			newState.Tunnels[index].Metadata = val
+		} else {
+			newState.Tunnels[index].Metadata.Size = 0
+		}
+		logger.Disklog.Debugf("Updated metadata %v with new metadata, %v", oldMeta, newMeta[tunnel.Metadata.Pool])
 	}
 	// commit to the statefile
+	logger.Disklog.Debugf("Updated metadata marshalling to JSON and saving state: %v", newState)
 	tunnelStateJSON, err := json.Marshal(newState)
 	if err != nil {
 		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)

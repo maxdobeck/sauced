@@ -40,7 +40,7 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 			logger.Disklog.Infof("Tunnel log started for tunnel: %s \n %s", launchArgs, m)
 		}
 	}
-	logger.Disklog.Infof("Tunnel %s closed", launchArgs)
+	logger.Disklog.Debugf("Tunnel %s closed", launchArgs)
 	defer scCmd.Wait()
 }
 
