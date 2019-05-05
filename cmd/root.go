@@ -19,36 +19,19 @@ import (
 	"os"
 	"sync"
 
-	"github.com/maxdobeck/sauced/logger"
-	"github.com/maxdobeck/sauced/manager"
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "sauced",
-	Short: "Read from a YAML file at $HOME/.config/sauced.yaml and list the changes",
-	Long:  `First test to read and watch a YAML config file.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// Get logfile
-		logfile, err := cmd.Flags().GetString("logfile")
-		if err != nil {
-			logger.Disklog.Warn("Problem retrieving logfile flag", err)
-		}
-		logger.SetupLogfile(logfile)
-
-		var wg sync.WaitGroup
-		// read in the sc startup commands
-		file, _ := os.Open(args[0])
-		fscanner := bufio.NewScanner(file)
-		for fscanner.Scan() {
-			if fscanner.Text() != "" {
-				wg.Add(1)
-				go manager.Start(fscanner.Text(), &wg)
-			}
-		}
-		wg.Wait()
-	},
+	Short: "Read from a config file at and start some tunnels.",
+	Long: `Will read from a user specified config file and start tunnels as they appear.
+Each tunnel should be on one line and separated by a newline character.  Use the start cmd
+to start all the specified tunnels.  Stop cmd will stop all tunnels that were started by the
+program.`,
+	// Run: func(cmd *cobra.Command, args []string) {
+	// },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -65,7 +48,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/sauced.yaml)")
-	rootCmd.PersistentFlags().StringP("logfile", "l", "/tmp/sauced.log", "logfile for meta-status output (default is /tmp/sauced.log)")
+	rootCmd.PersistentFlags().StringP("logfile", "l", "/tmp/sauced.log", "logfile for meta-status output")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

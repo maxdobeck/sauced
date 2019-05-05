@@ -1,3 +1,5 @@
+// +build windows
+
 package manager
 
 import (
@@ -31,9 +33,11 @@ func Start(launchArgs string, wg *sync.WaitGroup) {
 	for scanner.Scan() {
 		m := scanner.Text()
 		if strings.Contains(m, "Sauce Connect is up") {
-			logger.Disklog.Infof("Sauce Connect started! These arguments launched with success: %s Killing it for you now so you don't forget!", launchArgs)
-			// can't send interrupts on Windows!! Beware, must use scCmd.Process.Kill
-			Stop(scCmd.Process.Pid)
+			AddTunnel(launchArgs, path, scCmd.Process.Pid)
+			// logger.Disklog.Infof("Sauce Connect started! These arguments launched with success: %s Killing it for you now so you don't forget!", launchArgs)
+			// // can't send interrupts on Windows!! Beware, must use scCmd.Process.Kill
+			// Stop(scCmd.Process.Pid)
+			// RemoveTunnel(scCmd.Process.Pid)
 		}
 		if strings.Contains(m, "Log file:") {
 			logger.Disklog.Infof("Tunnel log started for tunnel: %s \n %s", launchArgs, m)
@@ -50,7 +54,7 @@ func Stop(Pid int) {
 		time.Sleep(6 * time.Second)
 		err := tunnel.Signal(os.Interrupt)
 		if err != nil {
-			logger.Disklog.Warnf("Problem killing Process", Pid, err)
+			logger.Disklog.Warnf("Problem killing Process %d %v", Pid, err)
 		}
 	}
 }

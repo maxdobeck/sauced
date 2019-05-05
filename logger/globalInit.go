@@ -1,8 +1,9 @@
 package logger
 
 import (
-	log "github.com/sirupsen/logrus"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Disklog logs to disk w/ this instance.  Logfile
@@ -17,23 +18,22 @@ func SetupLogfile(logfile string) {
 	Disklog.Out = os.Stdout
 	Disklog.Info("Looking for logfile: ", logfile)
 	if _, err := os.Stat(logfile); err == nil {
-		Disklog.Debug("Found logfile: ", logfile)
-		// ADD sauced LOG ROTATION HERE
-		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY, 0666)
+		Disklog.Info("Using existing file: ", logfile)
+		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
 			log.Info("Failed to log to file, using default stdout")
 		} else {
 			Disklog.Out = file
-			Disklog.Info("Started program and now writing to file.")
+			Disklog.Info("Started program and now writing to ", logfile)
 		}
 	} else if os.IsNotExist(err) {
-		log.Info(logfile, " NOT found: ", err)
-		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY, 0666)
+		log.Debug(logfile, " NOT found: ", err)
+		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
 			log.Info("Failed to log to file, using default stderr")
 		} else {
 			Disklog.Out = file
-			Disklog.Info("Started program and now writing to file.")
+			Disklog.Infof("Started program and now writing to %s.", logfile)
 		}
 	} else {
 		log.Warn("unable to set the logfile to", logfile)
