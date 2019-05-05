@@ -40,7 +40,8 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 			logger.Disklog.Infof("Tunnel log started for tunnel: %s \n %s", launchArgs, m)
 		}
 	}
-	logger.Disklog.Infof("Tunnel logfile closed")
+	logger.Disklog.Infof("Tunnel %s closed", launchArgs)
+	defer scCmd.Wait()
 }
 
 // Stop will halt a running process with SIGINT(CTRL-C)

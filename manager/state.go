@@ -105,9 +105,20 @@ func PruneState() {
 // UpdateState uses the derived metadata
 // to correct the statefile
 func UpdateState(newMeta map[string]Metadata) {
-	//newState := getLastKnownState()
+	newState := getLastKnownState()
 	// loop through the lastknownstate and update the .metadata based on the newMeta.
+	for _, tunnel := range newState.Tunnels {
+		tunnel.Metadata = newMeta[tunnel.Metadata.Pool]
+	}
 	// commit to the statefile
+	tunnelStateJSON, err := json.Marshal(newState)
+	if err != nil {
+		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
+	}
+	err = ioutil.WriteFile("/tmp/sauced-state.json", tunnelStateJSON, 0755)
+	if err != nil {
+		logger.Disklog.Warn("Could not write the tunnel state data to the JSON file: ", err)
+	}
 }
 
 // ShowState will list all the known tunnels

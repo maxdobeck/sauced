@@ -37,11 +37,14 @@ func CollectMetadata(config string) map[string]Metadata {
 			// then add to the metadata map.  And increment the Size as needed
 			if val, ok := meta[tunnelName]; ok {
 				val.Size = val.Size + 1
+				meta[tunnelName] = val
 			} else {
 				val = Metadata{Size: 1, Pool: tunnelName, Owner: username}
+				meta[val.Pool] = val
 			}
 		}
 	}
+	logger.Disklog.Infof("Found metadata from %s: %v", config, meta)
 	return meta
 }
 
