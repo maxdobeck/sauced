@@ -61,7 +61,7 @@ var startCmd = &cobra.Command{
 			}
 		}
 		wg.Wait()
-		logger.Disklog.Info("All tunnels must be closed.  Goodbye :)")
+		logger.Disklog.Info("According to statefile all tunnels are closed.  Goodbye :)")
 	},
 }
 
