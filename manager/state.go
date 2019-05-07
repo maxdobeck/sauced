@@ -27,9 +27,10 @@ type Tunnel struct {
 	Metadata   Metadata  `json:"metadata"`
 }
 
-func (tun Tunnel) rotateLog() error {
-	return nil
-}
+// add later
+// func (tun Tunnel) rotateLog() error {
+// 	return nil
+// }
 
 // AddTunnel will record the state of the tunnel
 // to the IPC file after the tunnel has launched as an OS process
