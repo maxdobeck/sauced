@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"io"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -20,19 +21,23 @@ func SetupLogfile(logfile string) {
 	if _, err := os.Stat(logfile); err == nil {
 		Disklog.Info("Using existing file: ", logfile)
 		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		multi := io.MultiWriter(os.Stdout, file)
+
 		if err != nil {
 			log.Info("Failed to log to file, using default stdout")
 		} else {
-			Disklog.Out = file
+			Disklog.Out = multi
 			Disklog.Info("Started program and now writing to ", logfile)
 		}
 	} else if os.IsNotExist(err) {
 		log.Debug(logfile, " NOT found: ", err)
 		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		multi := io.MultiWriter(os.Stdout, file)
+
 		if err != nil {
 			log.Info("Failed to log to file, using default stderr")
 		} else {
-			Disklog.Out = file
+			Disklog.Out = multi
 			Disklog.Infof("Started program and now writing to %s.", logfile)
 		}
 	} else {
