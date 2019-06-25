@@ -13,3 +13,6 @@ sauced
 *.out
 
 sauced.yaml
+
+builds/
+
