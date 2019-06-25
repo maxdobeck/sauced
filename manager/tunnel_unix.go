@@ -55,14 +55,17 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 func Stop(Pid int) {
 	tunnel, err := os.FindProcess(Pid)
 	if err != nil {
-		logger.Disklog.Warnf("Process ID %d does not exist or could not be sent the SIGINT.", Pid)
+		logger.Disklog.Warnf("Process ID %d does not exist or was not accessible for this user. Error: %v", Pid, err)
 	} else {
 		time.Sleep(6 * time.Second)
 		err := tunnel.Signal(os.Interrupt)
 		if err != nil {
-			logger.Disklog.Warnf("Problem killing Process %d %v", Pid, err)
+			logger.Disklog.Warnf("Problem killing Process %d %v.  The user may not have permissions to send a SIGINT or SIGKILL to the listed process.", Pid, err)
 		}
-		RemoveTunnel(Pid)
+		// Only amend statefile if there wasn't an error
+		if err == nil {
+			RemoveTunnel(Pid)
+		}
 	}
 }
 
