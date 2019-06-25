@@ -91,12 +91,17 @@ func PruneState() {
 		proc, _ := os.FindProcess(tunnel.PID)
 		syscallErr := proc.Signal(syscall.Signal(0))
 		if syscallErr != nil {
+			// catch OS permission issues.  Do not change state.Tunnels
+			if syscallErr.Error() == "operation not permitted" {
+				logger.Disklog.Warnf("Syscall Err on Signal(0) to tunnel PID %d: '%s'\nCheck that your current user has permissions to interact with this process. You may need 'sudo' or admin rights.", tunnel.PID, syscallErr)
+				return
+			}
 			// take everything to the left of i, then conjoin it w/ everything to the right of i
 			state.Tunnels = append(state.Tunnels[:i], state.Tunnels[i+1:]...)
-			// decrement our for loop scope so we don't go out of bounds
+			// decrement our for loop scope so we don't go out of bounds. do not remove.
 			i--
 			logger.Disklog.Infof("Found dead tunnel.  Removing from statefile: %v", tunnel)
-			logger.Disklog.Debugf("Syscall Err on Signal(0) %s for PID %d", syscallErr, tunnel.PID)
+			logger.Disklog.Warnf("Syscall Err on Signal(0) '%s' for PID %d", syscallErr, tunnel.PID)
 		}
 	}
 	tunnelStateJSON, err := json.Marshal(state)
