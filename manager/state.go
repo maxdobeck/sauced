@@ -64,15 +64,15 @@ func AddTunnel(launchArgs string, path string, PID int, meta Metadata, tunnelLog
 // RemoveTunnel deletes a tunnel entry from the
 // Last Known Tunnel object
 func RemoveTunnel(targetPID int) {
-	last := getLastKnownState()
-	for i := 0; i < len(last.Tunnels); i++ {
-		tunnel := last.Tunnels[i]
+	state := getLastKnownState()
+	for i := 0; i < len(state.Tunnels); i++ {
+		tunnel := state.Tunnels[i]
 		if tunnel.PID == targetPID {
-			last.Tunnels = append(last.Tunnels[:i], last.Tunnels[i+1:]...)
+			state.Tunnels = append(state.Tunnels[:i], state.Tunnels[i+1:]...)
 			break
 		}
 	}
-	tunnelStateJSON, err := json.Marshal(last)
+	tunnelStateJSON, err := json.Marshal(state)
 	if err != nil {
 		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
 	}
@@ -85,20 +85,21 @@ func RemoveTunnel(targetPID int) {
 // PruneState will access the state file and
 // remove any entries that are not found by the OS
 func PruneState() {
-	last := getLastKnownState()
-	for i := 0; i < len(last.Tunnels); i++ {
-		tunnel := last.Tunnels[i]
+	state := getLastKnownState()
+	for i := 0; i < len(state.Tunnels); i++ {
+		tunnel := state.Tunnels[i]
 		proc, _ := os.FindProcess(tunnel.PID)
 		syscallErr := proc.Signal(syscall.Signal(0))
 		if syscallErr != nil {
 			// take everything to the left of i, then conjoin it w/ everything to the right of i
-			last.Tunnels = append(last.Tunnels[:i], last.Tunnels[i+1:]...)
+			state.Tunnels = append(state.Tunnels[:i], state.Tunnels[i+1:]...)
 			// decrement our for loop scope so we don't go out of bounds
 			i--
 			logger.Disklog.Infof("Found dead tunnel.  Removing from statefile: %v", tunnel)
+			logger.Disklog.Debugf("Syscall Err on Signal(0) %s for PID %d", syscallErr, tunnel.PID)
 		}
 	}
-	tunnelStateJSON, err := json.Marshal(last)
+	tunnelStateJSON, err := json.Marshal(state)
 	if err != nil {
 		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
 	}
