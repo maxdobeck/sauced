@@ -1,30 +1,34 @@
 # sauced
 Managed Sauce Connect tunnels.
 
-## Install and Run
-`go get github.com/maxdobeck/sauced`
+[Why](why.md)
 
-or
+### Install and Run
+`go get github.com/maxdobeck/sauced` or clone the repo and put it in `$GOPATH/github.com/maxdobeck/sauced`.
 
-Clone the repo and put it in `$GOPATH/github.com/maxdobeck/sauced`.
-
-Create your config file.
-
-Run like `$ ./sauced ~/.config/config.txt`
-
-Move to the directory and run `$ go build`.  Run the binary like `./sauced`.  `.\sauced` on windows.  Be aware of other windows specific behavior like %GOPATH% instead of $GOPATH.
-
-Pass in the config file like so `$ ./sauced ~/.config/sauced.txt`.  The specified file should be read line by line and used to start a Sauce Connect instance.
-
-## Config File
-The config file should have one line for each SC instance.  The first portion of the line should be the path to the SC binary you want to use.  The other arguments should be the flags you would use if you were starting the tunnel manually from a command line.  The scheme should be:
+Create your [config](https://github.com/mdsauce/sauced#config-file) file like:
 
 ```
-/path/to/bin/sc <normal arguments>
+# ~/.config/sauced-config.txt
+# main tunnel pool
+/Users/maxdobeck/workspace/sauce_connect/sc-4.5.1-osx/bin/sc -u sauce.username -k sauce.access.key -v --no-remove-colliding-tunnels -N -i main-tunnel-pool --se-port 0 --pidfile /tmp/sc_client-1.pid 
+
+/Users/maxdobeck/workspace/sauce_connect/sc-4.5.1-osx/bin/sc -u sauce.username -k sauce.access.key -v --no-remove-colliding-tunnels -N -i main-tunnel-pool --se-port 0 --pidfile /tmp/sc_client-1.pid 
+
+/Users/maxdobeck/workspace/sauce_connect/sc-4.5.1-osx/bin/sc -u sauce.username -k sauce.access.key -v --no-remove-colliding-tunnels -N -i main-tunnel-pool --se-port 0 --pidfile /tmp/sc_client-1.pid 
+```
+
+Run with your config file from above: `$ sauced start ~/.config/sauced-config.txt`
+
+### Config File
+The config file should have one line for each SC instance.  The part of the line should be the full path to the SC binary you want to use.  The other arguments should be the flags you would use if you were starting the tunnel manually from a command line.  The scheme is be:
+
+```
+/path/to/bin/sc.exe <flags and arguments>
 ```
 
 An example of a single tunnel:
-`/home/user/tools/sc-4.5.1-linux/bin/sc -u account-name-here -k api-key-here -v`
+`/home/myuser/tools/sc-4.5.3-linux/bin/sc -u account-name-here -k api-key-here -v`
 
 
 An example of a pool of tunnels:
@@ -34,5 +38,5 @@ An example of a pool of tunnels:
 /home/user/tools/sc-4.5.1-linux/bin/sc -u account-name -k api-key-here -v --no-remove-colliding-tunnels -N -i main-tunnel-pool --se-port 0 
 ```
 
-## Testing
-Run `$ go test ./...`.  This goes through all directories recursively to run anything like `*_test.go`.
+### Testing
+Run `$ go test ./...`.
