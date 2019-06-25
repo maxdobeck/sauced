@@ -54,7 +54,7 @@ func PoolName(launchArgs string, pool chan string) {
 	//return the -i flag or anonymous if there is no name
 	args := strings.Split(launchArgs, " ")
 	for index, arg := range args {
-		if arg == "-i" {
+		if arg == "-i" || arg == "--tunnel-identifier" {
 			pool <- args[index+1]
 		}
 	}
