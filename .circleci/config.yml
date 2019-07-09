@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.12.7
+    working_directory: /go/sauced
+    steps:
+      - checkout
+      - run: pwd && ls 
+      - run: go build
+      - run: sauced --help
+      - run: sauced --version
