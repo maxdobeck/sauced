@@ -20,6 +20,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// CurVersion is a global reference to the version number set at build time
+var CurVersion = "DEV"
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "sauced",
@@ -28,6 +31,7 @@ var rootCmd = &cobra.Command{
 Each tunnel should be on one line and separated by a newline character.  Use the start cmd
 to start all the specified tunnels.  Stop cmd will stop all tunnels that were started by the
 program.`,
+	Version: fmt.Sprintf("%s", CurVersion),
 	// Run: func(cmd *cobra.Command, args []string) {
 	// },
 }
@@ -42,6 +46,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.Flags().Bool("version", false, "Print the version of sauced")
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.

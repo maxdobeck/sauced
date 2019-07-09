@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/maxdobeck/sauced/logger"
+	"github.com/mdsauce/sauced/logger"
 )
 
 // LastKnownTunnels will a json object with

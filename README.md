@@ -1,10 +1,11 @@
 # sauced
+[![CircleCI](https://circleci.com/gh/mdsauce/sauced/tree/master.svg?style=svg)](https://circleci.com/gh/mdsauce/sauced/tree/master)
 Managed Sauce Connect tunnels.
 
 [Why](why.md)
 
 ### Install and Run
-`go get github.com/maxdobeck/sauced` or clone the repo and put it in `$GOPATH/github.com/maxdobeck/sauced`.
+`go get github.com/mdsauce/sauced` or clone the repo and put it in `$GOPATH/github.com/mdsauce/sauced`.
 
 Create your [config](https://github.com/mdsauce/sauced#config-file) file like:
 

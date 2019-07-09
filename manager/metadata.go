@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/maxdobeck/sauced/logger"
+	"github.com/mdsauce/sauced/logger"
 )
 
 // Metadata is the collection of items that

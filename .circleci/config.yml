@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.11.5
+    working_directory: /go/sauced
+    steps:
+      - checkout
+      - run: pwd && ls 
+      - run: go build -ldflags "-X github.com/mdsauce/sauced/cmd.CurVersion=`git rev-parse --short HEAD`"
+      - run: ./sauced --help
+      - run: ./sauced --version

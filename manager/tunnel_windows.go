@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/maxdobeck/sauced/logger"
+	"github.com/mdsauce/sauced/logger"
 )
 
 // Start creates a new tunnel

@@ -15,8 +15,8 @@
 package cmd
 
 import (
-	"github.com/maxdobeck/sauced/logger"
-	"github.com/maxdobeck/sauced/manager"
+	"github.com/mdsauce/sauced/logger"
+	"github.com/mdsauce/sauced/manager"
 	"github.com/spf13/cobra"
 )
 
