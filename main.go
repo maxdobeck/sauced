@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/maxdobeck/sauced/cmd"
+import "github.com/mdsauce/sauced/cmd"
 
 func main() {
 	cmd.Execute()

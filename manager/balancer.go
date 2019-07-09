@@ -1,7 +1,7 @@
 package manager
 
 import (
-	"github.com/maxdobeck/sauced/logger"
+	"github.com/mdsauce/sauced/logger"
 )
 
 func balance(lastState []Tunnel, pool string) int {
