@@ -1,4 +1,5 @@
 # sauced
+[![CircleCI](https://circleci.com/gh/mdsauce/sauced/tree/master.svg?style=svg)](https://circleci.com/gh/mdsauce/sauced/tree/master)
 Managed Sauce Connect tunnels.
 
 [Why](why.md)
