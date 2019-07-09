@@ -3,7 +3,8 @@ module github.com/mdsauce/sauced
 go 1.12
 
 require (
-	github.com/mdsauce/sauced v0.0.0-20190625195425-3c6f473b833e
+	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.4.1
 	github.com/spf13/cobra v0.0.3
+	github.com/spf13/pflag v1.0.3 // indirect
 )
