@@ -19,7 +19,8 @@ Create your [config](https://github.com/mdsauce/sauced#config-file) file like:
 /Users/maxdobeck/workspace/sauce_connect/sc-4.5.1-osx/bin/sc -u sauce.username -k sauce.access.key -v --no-remove-colliding-tunnels -N -i main-tunnel-pool --se-port 0 --pidfile /tmp/sc_client-1.pid 
 ```
 
-Run with your config file from above: `$ sauced start ~/.config/sauced-config.txt`
+Run it: 
+`$ sauced start ~/.config/sauced-config.txt`
 
 ### Config File
 The config file should have one line for each SC instance.  The part of the line should be the full path to the SC binary you want to use.  The other arguments should be the flags you would use if you were starting the tunnel manually from a command line.  The scheme is be:
