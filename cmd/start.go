@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"sync"
 
@@ -40,7 +39,6 @@ var startCmd = &cobra.Command{
 			logger.Disklog.Warn("Problem retrieving logfile flag", err)
 		}
 
-		fmt.Println("config file here >>>>>>> ", configFile)
 		if !configUsable(configFile) {
 			logger.Disklog.Warn("You did not specify a config file!  Please pass in a file like 'sauced start --config /path/to/sauced-config.txt")
 			os.Exit(1)
