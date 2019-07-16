@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"sync"
 
@@ -30,15 +31,19 @@ var startCmd = &cobra.Command{
 	Short: "Start all tunnels listed in your config file you reference.",
 	Long:  `Start all tunnels in the config file you reference like $ sauced start ~/my-config.txt`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) < 1 {
-			logger.Disklog.Warn("You did not specify a config file!  Please write a .txt file and pass it in like $ sauced start /path/to/config.txt")
-			os.Exit(1)
+		configFile, err := cmd.Flags().GetString("config")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving config file flag", err)
 		}
-		configFile := args[0]
-		// Get logfile
 		logfile, err := cmd.Flags().GetString("logfile")
 		if err != nil {
 			logger.Disklog.Warn("Problem retrieving logfile flag", err)
+		}
+
+		fmt.Println("config file here >>>>>>> ", configFile)
+		if !configUsable(configFile) {
+			logger.Disklog.Warn("You did not specify a config file!  Please pass in a file like 'sauced start --config /path/to/sauced-config.txt")
+			os.Exit(1)
 		}
 		logger.SetupLogfile(logfile)
 
@@ -67,6 +72,7 @@ var startCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(startCmd)
+	startCmd.PersistentFlags().StringP("config", "c", "", "config file for tunnels to start.")
 
 	// Here you will define your flags and configuration settings.
 
@@ -77,4 +83,26 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// startCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func configUsable(file string) bool {
+	if file == "" || len(file) == 0 {
+		logger.Disklog.Warn("No config file passed in with -c or --config", file)
+		return false
+	}
+
+	fd, err := os.Stat(file)
+	if err != nil {
+		if os.IsNotExist(err) {
+			logger.Disklog.Warnf("Cannot find file '%s' it does not exist.", file)
+		}
+		logger.Disklog.Warnf("Problem getting information about file '%s' it may not exist.", file)
+		return false
+	}
+
+	if fd.IsDir() {
+		logger.Disklog.Warnf("%s is a directory and cannot be read as a config file.", file)
+		return false
+	}
+	return true
 }
