@@ -48,6 +48,12 @@ var startCmd = &cobra.Command{
 		if !configUsable(configFile) {
 			logger.Disklog.Warn("You did not specify a config file!  Please pass in a file like 'sauced start --config /path/to/sauced-config.txt")
 			configFile = findXdgConfigHome()
+
+			if len(configFile) < 2 {
+				logger.Disklog.Error("Problem retrieving config file flag.")
+				os.Exit(1)
+
+			}
 		}
 
 		manager.PruneState()
