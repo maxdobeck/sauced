@@ -30,20 +30,22 @@ var startCmd = &cobra.Command{
 	Short: "Start all tunnels listed in your config file you reference.",
 	Long:  `Start all tunnels in the config file you reference like $ sauced start ~/my-config.txt`,
 	Run: func(cmd *cobra.Command, args []string) {
-		configFile, err := cmd.Flags().GetString("config")
-		if err != nil {
-			logger.Disklog.Warn("Problem retrieving config file flag", err)
-		}
+
 		logfile, err := cmd.Flags().GetString("logfile")
 		if err != nil {
 			logger.Disklog.Warn("Problem retrieving logfile flag", err)
+		}
+		logger.SetupLogfile(logfile)
+
+		configFile, err := cmd.Flags().GetString("config")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving config file flag", err)
 		}
 
 		if !configUsable(configFile) {
 			logger.Disklog.Warn("You did not specify a config file!  Please pass in a file like 'sauced start --config /path/to/sauced-config.txt")
 			os.Exit(1)
 		}
-		logger.SetupLogfile(logfile)
 
 		manager.PruneState()
 		meta := manager.CollectMetadata(configFile)
