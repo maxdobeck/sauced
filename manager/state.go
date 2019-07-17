@@ -67,6 +67,7 @@ func RemoveTunnel(targetPID int) {
 	state := getLastKnownState()
 	for i := 0; i < len(state.Tunnels); i++ {
 		tunnel := state.Tunnels[i]
+		logger.Disklog.Infof("Closing Tunnel %s", tunnel.Args)
 		if tunnel.PID == targetPID {
 			state.Tunnels = append(state.Tunnels[:i], state.Tunnels[i+1:]...)
 			break

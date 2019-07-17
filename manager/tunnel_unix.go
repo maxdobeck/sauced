@@ -4,7 +4,6 @@ package manager
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -19,8 +18,7 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 	args := strings.Split(launchArgs, " ")
 	path := args[0]
 
-	if path == "#" || strings.Contains(path, "#") {
-		fmt.Println("path we're using here>>>>>>>>>>>>", path)
+	if eatLine(path) {
 		return
 	}
 
@@ -52,7 +50,6 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta, tunLog)
 		}
 	}
-	logger.Disklog.Debugf("Tunnel %s closed", launchArgs)
 	defer scCmd.Wait()
 }
 
