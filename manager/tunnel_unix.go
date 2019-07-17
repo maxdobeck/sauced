@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/mdsauce/sauced/logger"
 )
@@ -57,7 +56,6 @@ func Stop(Pid int) {
 	if err != nil {
 		logger.Disklog.Warnf("Process ID %d does not exist or was not accessible for this user. Error: %v", Pid, err)
 	} else {
-		time.Sleep(6 * time.Second)
 		err := tunnel.Signal(os.Interrupt)
 		if err != nil {
 			logger.Disklog.Warnf("Problem killing Process %d %v.  The user may not have permissions to send a SIGINT or SIGKILL to the listed process.", Pid, err)
