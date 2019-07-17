@@ -4,6 +4,7 @@ package manager
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -17,6 +18,11 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 	defer wg.Done()
 	args := strings.Split(launchArgs, " ")
 	path := args[0]
+
+	if path == "#" || strings.Contains(path, "#") {
+		fmt.Println("path we're using here>>>>>>>>>>>>", path)
+		return
+	}
 
 	if vacancy(meta) != true {
 		logger.Disklog.Infof("Too many tunnels open.  Not opening %s \n %v", meta.Pool, launchArgs)
