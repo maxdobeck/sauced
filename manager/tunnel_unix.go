@@ -18,7 +18,11 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 	args := strings.Split(launchArgs, " ")
 	path := args[0]
 
-	if startTunnel(meta) != true {
+	if eatLine(path) {
+		return
+	}
+
+	if vacancy(meta) != true {
 		logger.Disklog.Infof("Too many tunnels open.  Not opening %s \n %v", meta.Pool, launchArgs)
 		return
 	}
@@ -46,7 +50,6 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta, tunLog)
 		}
 	}
-	logger.Disklog.Debugf("Tunnel %s closed", launchArgs)
 	defer scCmd.Wait()
 }
 
