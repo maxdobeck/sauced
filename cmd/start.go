@@ -17,12 +17,15 @@ package cmd
 import (
 	"bufio"
 	"os"
+	"path"
 	"sync"
 
 	"github.com/mdsauce/sauced/logger"
 	"github.com/mdsauce/sauced/manager"
 	"github.com/spf13/cobra"
 )
+
+var defaultConfigPath = "/sauced/sauced-config.txt"
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
@@ -44,7 +47,27 @@ var startCmd = &cobra.Command{
 
 		if !configUsable(configFile) {
 			logger.Disklog.Warn("You did not specify a config file!  Please pass in a file like 'sauced start --config /path/to/sauced-config.txt")
-			os.Exit(1)
+			logger.Disklog.Debug("Looking for sauced-config.txt on XDG_CONFIG_HOME")
+
+			//TODO: Need to check if
+			xdgHome, isXdgSet := os.LookupEnv("XDG_CONFIG_HOME")
+			xdgConfigPath := path.Join(xdgHome, defaultConfigPath)
+
+			if !isXdgSet {
+				logger.Disklog.Debug("XDG_CONFIG_HOME not set. Exiting.")
+				os.Exit(1)
+
+			}
+
+			if !configUsable(xdgConfigPath) {
+				logger.Disklog.Debugf("No config file at %s", xdgConfigPath)
+				os.Exit(1)
+			}
+			// If we got here it means that there is a config file located on XDG_CONFIG_HOME
+			// assigning configFile to it
+
+			logger.Disklog.Debugf("Found config file. Setting to %s", xdgConfigPath)
+			configFile = xdgConfigPath
 		}
 
 		manager.PruneState()
