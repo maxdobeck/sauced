@@ -65,7 +65,7 @@ func AddTunnel(launchArgs string, path string, PID int, meta Metadata, tunnelLog
 // RemoveTunnel deletes a tunnel entry from the
 // Last Known Tunnel object
 func RemoveTunnel(targetPID int) {
-	state := getLastKnownState()
+	state := GetLastKnownState()
 	for i := 0; i < len(state.Tunnels); i++ {
 		tunnel := state.Tunnels[i]
 		logger.Disklog.Infof("Closing Tunnel %s", tunnel.Args)
@@ -87,7 +87,7 @@ func RemoveTunnel(targetPID int) {
 // PruneState will access the state file and
 // remove any entries that are not found by the OS
 func PruneState() {
-	state := getLastKnownState()
+	state := GetLastKnownState()
 	for i := 0; i < len(state.Tunnels); i++ {
 		tunnel := state.Tunnels[i]
 		proc, _ := os.FindProcess(tunnel.PID)
@@ -119,7 +119,7 @@ func PruneState() {
 // UpdateState uses the derived metadata
 // to correct the statefile
 func UpdateState(newMeta map[string]Metadata) {
-	newState := getLastKnownState()
+	newState := GetLastKnownState()
 	// loop through the lastknownstate and update the .metadata based on the newMeta.
 	for index, tunnel := range newState.Tunnels {
 		oldMeta := tunnel.Metadata
@@ -142,26 +142,12 @@ func UpdateState(newMeta map[string]Metadata) {
 	}
 }
 
-// ShowState will list all the known tunnels
-func ShowState() {
-	last := getLastKnownState()
-	logger.Disklog.Info(last)
-}
-
-// ShowStateJSON will pretty print JSON
-func ShowStateJSON() {
-	last := getLastKnownState()
-	lastJSON, err := json.MarshalIndent(last, "", "    ")
-	if err != nil {
-		logger.Disklog.Warnf("Could not format JSON with Indents: %v", err)
-	}
-	logger.Disklog.Info(string(lastJSON))
-}
-
-func getLastKnownState() LastKnownTunnels {
+// GetLastKnownState will retrieve a byte[] slice with the contents
+// of the /tmp/sauced-stat.json file
+func GetLastKnownState() LastKnownTunnels {
 	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
 	if err != nil {
-		logger.Disklog.Warn("Could notget last known state from file: ", err)
+		logger.Disklog.Warn("Could not get last known state from file: ", err)
 	}
 	var tunnelsState LastKnownTunnels
 
