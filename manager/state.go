@@ -142,8 +142,7 @@ func UpdateState(newMeta map[string]Metadata) {
 	}
 }
 
-// GetLastKnownState will retrieve a byte[] slice with the contents
-// of the /tmp/sauced-stat.json file
+// GetLastKnownState will retrieve a byte[] slice with the contents of the sauced-state.json file
 func GetLastKnownState() LastKnownTunnels {
 	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
 	if err != nil {
