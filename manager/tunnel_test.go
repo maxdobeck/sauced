@@ -27,7 +27,7 @@ func TestSCFailsOnBadInput(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go Start(scBinary, &wg, Metadata{})
-	tunnels := getLastKnownState()
+	tunnels := GetLastKnownState()
 	if len(tunnels.Tunnels) != 0 {
 		t.Fail()
 	}

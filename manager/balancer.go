@@ -17,7 +17,7 @@ func balance(lastState []Tunnel, pool string) int {
 }
 
 func vacancy(config Metadata) bool {
-	state := getLastKnownState()
+	state := GetLastKnownState()
 	curBal := balance(state.Tunnels, config.Pool)
 	if curBal < config.Size {
 		return true
