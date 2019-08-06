@@ -38,16 +38,26 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 	scanner := bufio.NewScanner(stdout)
 	scanner.Split(bufio.ScanLines)
 
+	// this parsing should be moved to its own funciton.
+	// everything should be parsed then supplied to the AddTunnel() func
 	var tunLog string
+	var asgnID string
 	for scanner.Scan() {
 		m := scanner.Text()
+		// should be a func that is unit tested
 		if strings.Contains(m, "Log file:") {
 			ll := strings.Split(m, " ")
 			tunLog = ll[len(ll)-1]
 			logger.Disklog.Infof("Tunnel log started for tunnel: %s \n %s", launchArgs, m)
 		}
+		// should be a func that is unit tested
+		if strings.Contains(m, "Tunnel ID:") {
+			idLine := strings.Split(m, " ")
+			asgnID = idLine[len(idLine)-1]
+			logger.Disklog.Infof("Tunnel: %s has AssignedID %s", launchArgs, asgnID)
+		}
 		if strings.Contains(m, "Sauce Connect is up") {
-			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta, tunLog)
+			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta, tunLog, asgnID)
 		}
 	}
 	defer scCmd.Wait()
