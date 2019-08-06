@@ -83,7 +83,7 @@ func Stop(Pid int) {
 // StopAll will send a kill or SIGINT signal
 // to all tunnels that are running.
 func StopAll() {
-	last := getLastKnownState()
+	last := GetLastKnownState()
 	for _, tunnel := range last.Tunnels {
 		Stop(tunnel.PID)
 	}
