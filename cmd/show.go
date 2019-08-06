@@ -17,6 +17,7 @@ package cmd
 import (
 	"github.com/mdsauce/sauced/logger"
 	"github.com/mdsauce/sauced/manager"
+	"github.com/mdsauce/sauced/output"
 
 	"github.com/spf13/cobra"
 )
@@ -29,7 +30,7 @@ var showCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		logger.Disklog.Debug("show called by the user.  Pruning then listing all tunnels.")
 		manager.PruneState()
-		manager.ShowStateJSON()
+		output.ShowStateJSON()
 	},
 }
 
