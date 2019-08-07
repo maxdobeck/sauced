@@ -2,6 +2,7 @@ package manager
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
 	"syscall"
@@ -32,6 +33,19 @@ type Tunnel struct {
 // func (tun Tunnel) rotateLog() error {
 // 	return nil
 // }
+
+func (tState LastKnownTunnels) findTunnel(targetPID int) (Tunnel, error) {
+	var tunnel Tunnel
+	for i := 0; i < len(tState.Tunnels); i++ {
+		tunnel = tState.Tunnels[i]
+		logger.Disklog.Infof("Closing Tunnel %s", tunnel.Args)
+		if tunnel.PID == targetPID {
+			return tunnel, nil
+
+		}
+	}
+	return tunnel, errors.New("No tunnel found with given PID")
+}
 
 // AddTunnel will record the state of the tunnel
 // to the IPC file after the tunnel has launched as an OS process
