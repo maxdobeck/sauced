@@ -16,9 +16,7 @@ package cmd
 
 import (
 	"github.com/mdsauce/sauced/logger"
-	"github.com/mdsauce/sauced/manager"
 	"github.com/mdsauce/sauced/output"
-
 	"github.com/spf13/cobra"
 )
 
@@ -28,14 +26,17 @@ var showCmd = &cobra.Command{
 	Short: "List all last known tunnels.",
 	Long:  `The tunnel state list will be pruned and then all active tunnels will be shown.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Disklog.Debug("show called by the user.  Pruning then listing all tunnels.")
-		manager.PruneState()
-		output.ShowStateJSON()
+		human, err := cmd.Flags().GetBool("human")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving human flag", err)
+		}
+		output.PrintState(human)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(showCmd)
+	showCmd.PersistentFlags().Bool("human", false, "output ")
 
 	// Here you will define your flags and configuration settings.
 
