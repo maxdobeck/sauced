@@ -52,7 +52,7 @@ func (tState LastKnownTunnels) findTunnel(targetPID int) (Tunnel, error) {
 func AddTunnel(launchArgs string, path string, PID int, meta Metadata, tunnelLog string, asgnID string) {
 	createIPCFile()
 
-	var tunnelsState LastKnownTunnels
+	var state LastKnownTunnels
 	tun := Tunnel{PID, asgnID, path, launchArgs, time.Now().UTC(), tunnelLog, meta}
 
 	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
@@ -60,20 +60,13 @@ func AddTunnel(launchArgs string, path string, PID int, meta Metadata, tunnelLog
 		logger.Disklog.Warn("Could not read from statefile: ", err)
 	}
 	if rawValue == nil {
-		tunnelsState.Tunnels = append(tunnelsState.Tunnels, tun)
+		state.Tunnels = append(state.Tunnels, tun)
 	} else {
-		json.Unmarshal(rawValue, &tunnelsState)
-		tunnelsState.Tunnels = append(tunnelsState.Tunnels, tun)
+		json.Unmarshal(rawValue, &state)
+		state.Tunnels = append(state.Tunnels, tun)
 	}
 
-	tunnelStateJSON, err := json.Marshal(tunnelsState)
-	if err != nil {
-		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
-	}
-	err = ioutil.WriteFile("/tmp/sauced-state.json", tunnelStateJSON, 0755)
-	if err != nil {
-		logger.Disklog.Warn("Could not write the tunnel state data to the JSON file: ", err)
-	}
+	saveState(state)
 }
 
 // RemoveTunnel deletes a tunnel entry from the
@@ -88,14 +81,7 @@ func RemoveTunnel(targetPID int) {
 			break
 		}
 	}
-	tunnelStateJSON, err := json.Marshal(state)
-	if err != nil {
-		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
-	}
-	err = ioutil.WriteFile("/tmp/sauced-state.json", tunnelStateJSON, 0755)
-	if err != nil {
-		logger.Disklog.Warn("Could not write the tunnel state data to the JSON file: ", err)
-	}
+	saveState(state)
 }
 
 // PruneState will access the state file and
@@ -120,14 +106,7 @@ func PruneState() {
 			logger.Disklog.Warnf("Syscall Err on Signal(0) '%s' for PID %d", syscallErr, tunnel.PID)
 		}
 	}
-	tunnelStateJSON, err := json.Marshal(state)
-	if err != nil {
-		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
-	}
-	err = ioutil.WriteFile("/tmp/sauced-state.json", tunnelStateJSON, 0755)
-	if err != nil {
-		logger.Disklog.Warn("Could not write the tunnel state data to the JSON file: ", err)
-	}
+	saveState(state)
 }
 
 // GetLastKnownState will retrieve a byte[] slice with the contents of the sauced-state.json file
@@ -136,10 +115,10 @@ func GetLastKnownState() LastKnownTunnels {
 	if err != nil {
 		logger.Disklog.Warn("Could not get last known state from file: ", err)
 	}
-	var tunnelsState LastKnownTunnels
+	var state LastKnownTunnels
 
-	json.Unmarshal(rawValue, &tunnelsState)
-	return tunnelsState
+	json.Unmarshal(rawValue, &state)
+	return state
 }
 
 func createIPCFile() {
@@ -154,5 +133,16 @@ func createIPCFile() {
 		defer file.Close()
 	} else {
 		logger.Disklog.Warn("unable to find /tmp/sauced-state.json")
+	}
+}
+
+func saveState(newState LastKnownTunnels) {
+	tunnelStateJSON, err := json.Marshal(newState)
+	if err != nil {
+		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
+	}
+	err = ioutil.WriteFile("/tmp/sauced-state.json", tunnelStateJSON, 0755)
+	if err != nil {
+		logger.Disklog.Warn("Could not write the tunnel state data to the JSON file: ", err)
 	}
 }
