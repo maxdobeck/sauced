@@ -130,32 +130,6 @@ func PruneState() {
 	}
 }
 
-// UpdateState uses the derived metadata
-// to correct the statefile
-func UpdateState(newMeta map[string]Metadata) {
-	newState := GetLastKnownState()
-	// loop through the lastknownstate and update the .metadata based on the newMeta.
-	for index, tunnel := range newState.Tunnels {
-		oldMeta := tunnel.Metadata
-		if val, ok := newMeta[tunnel.Metadata.Pool]; ok {
-			newState.Tunnels[index].Metadata = val
-		} else {
-			newState.Tunnels[index].Metadata.Size = 0
-		}
-		logger.Disklog.Debugf("Updated metadata %v with new metadata, %v", oldMeta, newMeta[tunnel.Metadata.Pool])
-	}
-	// commit to the statefile
-	logger.Disklog.Debugf("Updated metadata marshalling to JSON and saving state: %v", newState)
-	tunnelStateJSON, err := json.Marshal(newState)
-	if err != nil {
-		logger.Disklog.Warn("Could not marshall the tunnel state data into JSON object: ", err)
-	}
-	err = ioutil.WriteFile("/tmp/sauced-state.json", tunnelStateJSON, 0755)
-	if err != nil {
-		logger.Disklog.Warn("Could not write the tunnel state data to the JSON file: ", err)
-	}
-}
-
 // GetLastKnownState will retrieve a byte[] slice with the contents of the sauced-state.json file
 func GetLastKnownState() LastKnownTunnels {
 	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")

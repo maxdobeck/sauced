@@ -58,7 +58,6 @@ var startCmd = &cobra.Command{
 
 		manager.PruneState()
 		meta := manager.CollectMetadata(configFile)
-		manager.UpdateState(meta)
 
 		var wg sync.WaitGroup
 		// read in the sc startup commands
