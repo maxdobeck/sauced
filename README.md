@@ -5,7 +5,8 @@ Managed Sauce Connect tunnels.
 [Why](why.md)
 
 ### Install and Run
-`go get github.com/mdsauce/sauced` or clone the repo and put it in `$GOPATH/github.com/mdsauce/sauced`.
+1. `go get github.com/mdsauce/sauced`
+2.  clone the repo and put it in `$GOPATH/github.com/mdsauce/sauced`
 
 Create your [config](https://github.com/mdsauce/sauced#config-file) file for sauce labs like below.  You must manually put the access key and username in, environment variables will not be read.
 
