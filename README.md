@@ -1,4 +1,4 @@
-# sauced
+# Sauced
 [![CircleCI](https://circleci.com/gh/mdsauce/sauced/tree/master.svg?style=svg)](https://circleci.com/gh/mdsauce/sauced/tree/master)
 Managed Sauce Connect tunnels.
 
@@ -7,7 +7,7 @@ Managed Sauce Connect tunnels.
 ### Install and Run
 `go get github.com/mdsauce/sauced` or clone the repo and put it in `$GOPATH/github.com/mdsauce/sauced`.
 
-Create your [config](https://github.com/mdsauce/sauced#config-file) file like:
+Create your [config](https://github.com/mdsauce/sauced#config-file) file for sauce labs like below.  You must manually put the access key and username in, environment variables will not be read.
 
 ```
 # ~/.config/sauced-config.txt
