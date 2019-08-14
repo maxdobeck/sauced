@@ -11,6 +11,7 @@ Managed Sauce Connect tunnels.
 Create your [config](https://github.com/mdsauce/sauced#config-file) file for sauce labs like below.  You must manually put the access key and username in, environment variables will not be read.
 
 ```
+# '#' <- This is a comment and the line will be ignored.
 # ~/.config/sauced-config.txt
 # main tunnel pool
 /Users/maxdobeck/workspace/sauce_connect/sc-4.5.1-osx/bin/sc -u sauce.username -k sauce.access.key -v --no-remove-colliding-tunnels -N -i main-tunnel-pool --se-port 0 --pidfile /tmp/sc_client-1.pid 
@@ -43,3 +44,6 @@ An example of a pool of tunnels:
 
 ### Testing
 Run `$ go test ./...`.
+
+### Building for another platform
+Run the `build.sh` script and find the binary for the OS of your choosing in the `builds/` directory. 
