@@ -52,6 +52,24 @@ func ShowPool(poolName string) {
 	}
 }
 
+// ShowTunnel is in charge getting state and searching for a single tunnel by ID.
+func ShowTunnel(assignedID string) {
+	var tstate LastKnownTunnels
+	tstate = GetLastKnownState()
+
+	tunnels, err := tstate.findTunnelsByID(assignedID)
+
+	if err != nil {
+		logger.Disklog.Info(err)
+	} else {
+		tunnelsJSON, err := json.MarshalIndent(tunnels, "", "    ")
+		if err != nil {
+			logger.Disklog.Warnf("Could not format JSON with Indents: %v", err)
+		}
+		logger.Disklog.Info(string(tunnelsJSON))
+	}
+}
+
 func (tState LastKnownTunnels) findTunnelByPID(targetPID int) (Tunnel, error) {
 	var tunnel Tunnel
 	for i := 0; i < len(tState.Tunnels); i++ {
@@ -79,6 +97,20 @@ func (tState LastKnownTunnels) findTunnelsByPool(poolName string) ([]Tunnel, err
 		return tunnels, errors.New("No tunnel found with given Pool name")
 	}
 	return tunnels, nil
+}
+
+func (tState LastKnownTunnels) findTunnelsByID(assignedID string) (Tunnel, error) {
+	var tunnel Tunnel
+	for i := 0; i < len(tState.Tunnels); i++ {
+		tunnel = tState.Tunnels[i]
+		if tunnel.AssignedID == assignedID {
+			return tunnel, nil
+
+		}
+	}
+
+	return tunnel, errors.New("No tunnel found with given ID")
+
 }
 
 // AddTunnel will record the state of the tunnel

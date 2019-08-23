@@ -39,8 +39,14 @@ var showCmd = &cobra.Command{
 		manager.PruneState()
 
 		pool, _ := cmd.Flags().GetString("pool")
+		id, _ := cmd.Flags().GetString("id")
+
 		logger.Disklog.Debug("Pool name searched: ", pool)
-		if pool == "" {
+		logger.Disklog.Debug("ID searched: ", id)
+
+		if pool == "" && id != "" {
+			manager.ShowTunnel(id)
+		} else if pool == "" && id == "" {
 			output.ShowStateJSON()
 		} else {
 			manager.ShowPool(pool)
@@ -62,5 +68,7 @@ func init() {
 	// is called directly, e.g.:
 	// showCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	showCmd.Flags().String("pool", "", "Pool name of tunnels. May return one or more results.")
+	showCmd.Flags().String("pool", "", "Pool name of tunnels. May return one or more results. Takes precedence over --id")
+	showCmd.Flags().String("id", "", "Assigned ID for a given tunnel.")
+
 }
