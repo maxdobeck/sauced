@@ -45,7 +45,7 @@ var showCmd = &cobra.Command{
 		logger.Disklog.Debug("ID searched: ", id)
 
 		if pool == "" && id != "" {
-			manager.ShowTunnel(id)
+			output.ShowTunnelJSON(id)
 		} else if pool == "" && id == "" {
 			output.ShowStateJSON()
 		} else {

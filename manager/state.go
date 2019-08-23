@@ -36,28 +36,9 @@ type Tunnel struct {
 
 // ShowPool is in charge getting state and searching for a pool of tunnels
 func ShowPool(poolName string) {
-	var tstate LastKnownTunnels
-	tstate = GetLastKnownState()
+	tstate := GetLastKnownState()
 
-	tunnels, err := tstate.findTunnelsByPool(poolName)
-
-	if err != nil {
-		logger.Disklog.Info(err)
-	} else {
-		tunnelsJSON, err := json.MarshalIndent(tunnels, "", "    ")
-		if err != nil {
-			logger.Disklog.Warnf("Could not format JSON with Indents: %v", err)
-		}
-		logger.Disklog.Info(string(tunnelsJSON))
-	}
-}
-
-// ShowTunnel is in charge getting state and searching for a single tunnel by ID.
-func ShowTunnel(assignedID string) {
-	var tstate LastKnownTunnels
-	tstate = GetLastKnownState()
-
-	tunnels, err := tstate.findTunnelsByID(assignedID)
+	tunnels, err := tstate.FindTunnelsByPool(poolName)
 
 	if err != nil {
 		logger.Disklog.Info(err)
@@ -70,7 +51,7 @@ func ShowTunnel(assignedID string) {
 	}
 }
 
-func (tState LastKnownTunnels) findTunnelByPID(targetPID int) (Tunnel, error) {
+func (tState LastKnownTunnels) FindTunnelByPID(targetPID int) (Tunnel, error) {
 	var tunnel Tunnel
 	for i := 0; i < len(tState.Tunnels); i++ {
 		tunnel = tState.Tunnels[i]
@@ -82,7 +63,7 @@ func (tState LastKnownTunnels) findTunnelByPID(targetPID int) (Tunnel, error) {
 	return tunnel, errors.New("No tunnel found with given PID")
 }
 
-func (tState LastKnownTunnels) findTunnelsByPool(poolName string) ([]Tunnel, error) {
+func (tState LastKnownTunnels) FindTunnelsByPool(poolName string) ([]Tunnel, error) {
 	var tunnel Tunnel
 	tunnels := make([]Tunnel, 0)
 	for i := 0; i < len(tState.Tunnels); i++ {
@@ -99,7 +80,7 @@ func (tState LastKnownTunnels) findTunnelsByPool(poolName string) ([]Tunnel, err
 	return tunnels, nil
 }
 
-func (tState LastKnownTunnels) findTunnelsByID(assignedID string) (Tunnel, error) {
+func (tState LastKnownTunnels) FindTunnelsByID(assignedID string) (Tunnel, error) {
 	var tunnel Tunnel
 	for i := 0; i < len(tState.Tunnels); i++ {
 		tunnel = tState.Tunnels[i]
