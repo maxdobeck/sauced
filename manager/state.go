@@ -34,23 +34,6 @@ type Tunnel struct {
 // 	return nil
 // }
 
-// ShowPool is in charge getting state and searching for a pool of tunnels
-func ShowPool(poolName string) {
-	tstate := GetLastKnownState()
-
-	tunnels, err := tstate.FindTunnelsByPool(poolName)
-
-	if err != nil {
-		logger.Disklog.Info(err)
-	} else {
-		tunnelsJSON, err := json.MarshalIndent(tunnels, "", "    ")
-		if err != nil {
-			logger.Disklog.Warnf("Could not format JSON with Indents: %v", err)
-		}
-		logger.Disklog.Info(string(tunnelsJSON))
-	}
-}
-
 func (tState LastKnownTunnels) FindTunnelByPID(targetPID int) (Tunnel, error) {
 	var tunnel Tunnel
 	for i := 0; i < len(tState.Tunnels); i++ {

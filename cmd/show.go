@@ -49,7 +49,7 @@ var showCmd = &cobra.Command{
 		} else if pool == "" && id == "" {
 			output.ShowStateJSON()
 		} else {
-			manager.ShowPool(pool)
+			output.ShowPool(pool)
 		}
 
 	},
