@@ -34,6 +34,7 @@ type Tunnel struct {
 // 	return nil
 // }
 
+// FindTunnelByPID gets a PID int and finds a given tunnel
 func (tState LastKnownTunnels) FindTunnelByPID(targetPID int) (Tunnel, error) {
 	var tunnel Tunnel
 	for i := 0; i < len(tState.Tunnels); i++ {
@@ -46,6 +47,7 @@ func (tState LastKnownTunnels) FindTunnelByPID(targetPID int) (Tunnel, error) {
 	return tunnel, errors.New("No tunnel found with given PID")
 }
 
+// FindTunnelsByPool gets a pool name and returns a list of tunnels
 func (tState LastKnownTunnels) FindTunnelsByPool(poolName string) ([]Tunnel, error) {
 	var tunnel Tunnel
 	tunnels := make([]Tunnel, 0)
@@ -63,6 +65,7 @@ func (tState LastKnownTunnels) FindTunnelsByPool(poolName string) ([]Tunnel, err
 	return tunnels, nil
 }
 
+// FindTunnelsByID gets a tunnel ID and returns a tunnel
 func (tState LastKnownTunnels) FindTunnelsByID(assignedID string) (Tunnel, error) {
 	var tunnel Tunnel
 	for i := 0; i < len(tState.Tunnels); i++ {
