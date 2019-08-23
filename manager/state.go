@@ -34,17 +34,51 @@ type Tunnel struct {
 // 	return nil
 // }
 
-func (tState LastKnownTunnels) findTunnel(targetPID int) (Tunnel, error) {
+// ShowPool is in charge getting state and searching for a pool of tunnels
+func ShowPool(poolName string) {
+	var tstate LastKnownTunnels
+	tstate = GetLastKnownState()
+
+	tunnels, err := tstate.findTunnelsByPool(poolName)
+
+	if err != nil {
+		logger.Disklog.Info(err)
+	} else {
+		tunnelsJSON, err := json.MarshalIndent(tunnels, "", "    ")
+		if err != nil {
+			logger.Disklog.Warnf("Could not format JSON with Indents: %v", err)
+		}
+		logger.Disklog.Info(string(tunnelsJSON))
+	}
+}
+
+func (tState LastKnownTunnels) findTunnelByPID(targetPID int) (Tunnel, error) {
 	var tunnel Tunnel
 	for i := 0; i < len(tState.Tunnels); i++ {
 		tunnel = tState.Tunnels[i]
-		logger.Disklog.Infof("Closing Tunnel %s", tunnel.Args)
 		if tunnel.PID == targetPID {
 			return tunnel, nil
 
 		}
 	}
 	return tunnel, errors.New("No tunnel found with given PID")
+}
+
+func (tState LastKnownTunnels) findTunnelsByPool(poolName string) ([]Tunnel, error) {
+	var tunnel Tunnel
+	tunnels := make([]Tunnel, 0)
+	for i := 0; i < len(tState.Tunnels); i++ {
+		tunnel = tState.Tunnels[i]
+		if tunnel.Metadata.Pool == poolName {
+			tunnels = append(tunnels, tunnel)
+
+		}
+	}
+	if len(tunnels) == 0 {
+
+		return tunnels, errors.New("No tunnel found with given Pool name")
+	}
+	return tunnels, nil
 }
 
 // AddTunnel will record the state of the tunnel
@@ -75,7 +109,6 @@ func RemoveTunnel(targetPID int) {
 	state := GetLastKnownState()
 	for i := 0; i < len(state.Tunnels); i++ {
 		tunnel := state.Tunnels[i]
-		logger.Disklog.Infof("Closing Tunnel %s", tunnel.Args)
 		if tunnel.PID == targetPID {
 			state.Tunnels = append(state.Tunnels[:i], state.Tunnels[i+1:]...)
 			break
