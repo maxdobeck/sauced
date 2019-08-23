@@ -34,17 +34,50 @@ type Tunnel struct {
 // 	return nil
 // }
 
-func (tState LastKnownTunnels) findTunnel(targetPID int) (Tunnel, error) {
+// FindTunnelByPID gets a PID int and finds a given tunnel
+func (tState LastKnownTunnels) FindTunnelByPID(targetPID int) (Tunnel, error) {
 	var tunnel Tunnel
 	for i := 0; i < len(tState.Tunnels); i++ {
 		tunnel = tState.Tunnels[i]
-		logger.Disklog.Infof("Closing Tunnel %s", tunnel.Args)
 		if tunnel.PID == targetPID {
 			return tunnel, nil
 
 		}
 	}
 	return tunnel, errors.New("No tunnel found with given PID")
+}
+
+// FindTunnelsByPool gets a pool name and returns a list of tunnels
+func (tState LastKnownTunnels) FindTunnelsByPool(poolName string) ([]Tunnel, error) {
+	var tunnel Tunnel
+	tunnels := make([]Tunnel, 0)
+	for i := 0; i < len(tState.Tunnels); i++ {
+		tunnel = tState.Tunnels[i]
+		if tunnel.Metadata.Pool == poolName {
+			tunnels = append(tunnels, tunnel)
+
+		}
+	}
+	if len(tunnels) == 0 {
+
+		return tunnels, errors.New("No tunnel found with given Pool name")
+	}
+	return tunnels, nil
+}
+
+// FindTunnelsByID gets a tunnel ID and returns a tunnel
+func (tState LastKnownTunnels) FindTunnelsByID(assignedID string) (Tunnel, error) {
+	var tunnel Tunnel
+	for i := 0; i < len(tState.Tunnels); i++ {
+		tunnel = tState.Tunnels[i]
+		if tunnel.AssignedID == assignedID {
+			return tunnel, nil
+
+		}
+	}
+
+	return tunnel, errors.New("No tunnel found with given ID")
+
 }
 
 // AddTunnel will record the state of the tunnel
@@ -75,7 +108,6 @@ func RemoveTunnel(targetPID int) {
 	state := GetLastKnownState()
 	for i := 0; i < len(state.Tunnels); i++ {
 		tunnel := state.Tunnels[i]
-		logger.Disklog.Infof("Closing Tunnel %s", tunnel.Args)
 		if tunnel.PID == targetPID {
 			state.Tunnels = append(state.Tunnels[:i], state.Tunnels[i+1:]...)
 			break

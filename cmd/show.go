@@ -28,9 +28,30 @@ var showCmd = &cobra.Command{
 	Short: "List all last known tunnels.",
 	Long:  `The tunnel state list will be pruned and then all active tunnels will be shown.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Disklog.Debug("show called by the user.  Pruning then listing all tunnels.")
+		//TODO: This should be it's function since it's called on all files.
+		logfile, err := cmd.Flags().GetString("logfile")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving logfile flag", err)
+		}
+		logger.SetupLogfile(logfile)
+
+		logger.Disklog.Debug("show called by the user. Pruning then listing all tunnels.")
 		manager.PruneState()
-		output.ShowStateJSON()
+
+		pool, _ := cmd.Flags().GetString("pool")
+		id, _ := cmd.Flags().GetString("id")
+
+		logger.Disklog.Debug("Pool name searched: ", pool)
+		logger.Disklog.Debug("ID searched: ", id)
+
+		if pool == "" && id != "" {
+			output.ShowTunnelJSON(id)
+		} else if pool == "" && id == "" {
+			output.ShowStateJSON()
+		} else {
+			output.ShowPool(pool)
+		}
+
 	},
 }
 
@@ -46,4 +67,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// showCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	showCmd.Flags().String("pool", "", "Pool name of tunnels. May return one or more results. Takes precedence over --id")
+	showCmd.Flags().String("id", "", "Assigned ID for a given tunnel.")
+
 }
