@@ -28,11 +28,18 @@ var showCmd = &cobra.Command{
 	Short: "List all last known tunnels.",
 	Long:  `The tunnel state list will be pruned and then all active tunnels will be shown.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Disklog.Info("show called by the user. Pruning then listing all tunnels.")
+		//TODO: This should be it's function since it's called on all files.
+		logfile, err := cmd.Flags().GetString("logfile")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving logfile flag", err)
+		}
+		logger.SetupLogfile(logfile)
+
+		logger.Disklog.Debug("show called by the user. Pruning then listing all tunnels.")
 		manager.PruneState()
 
 		pool, _ := cmd.Flags().GetString("pool")
-		logger.Disklog.Info("Pool name searched: ", pool)
+		logger.Disklog.Debug("Pool name searched: ", pool)
 		if pool == "" {
 			output.ShowStateJSON()
 		} else {
