@@ -29,6 +29,23 @@ var stopCmd = &cobra.Command{
 		logger.Disklog.Info("Stop command sent.  Stopping all tunnels.")
 		manager.StopAll()
 		logger.Disklog.Info("All tunnels sent the Kill, Interrupt, or SIGINT signal.  Sauced closing.")
+
+		pool, _ := cmd.Flags().GetString("pool")
+		id, _ := cmd.Flags().GetString("id")
+		all, _ := cmd.Flags().GetBool("all")
+
+		logger.Disklog.Debug("All flag: ", all)
+		logger.Disklog.Debug("Pool name searched: ", pool)
+		logger.Disklog.Debug("ID searched: ", id)
+
+		if pool == "" && id != "" {
+
+		} else if pool == "" && id == "" {
+
+		} else {
+
+		}
+
 	},
 }
 
@@ -44,4 +61,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// stopCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	stopCmd.Flags().String("pool", "", "Pool name of tunnels. May return one or more results. Takes precedence over --id")
+	stopCmd.Flags().String("id", "", "Assigned ID for a given tunnel.")
+	stopCmd.Flags().Bool("all", false, "Allows stopping all active tunnels. Takes precedence over all other flags.")
 }
