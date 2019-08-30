@@ -16,8 +16,7 @@ type LastKnownTunnels struct {
 	Tunnels []Tunnel `json:"tunnels"`
 }
 
-// Tunnel is a json representation
-// of an OS process after SC has launched
+// Tunnel is a logical representation of a Sauce Connect tunnel once it has started on an OS
 type Tunnel struct {
 	PID        int       `json:"pid"`
 	AssignedID string    `json:"assignedID"`
@@ -95,14 +94,16 @@ func AddTunnel(launchArgs string, path string, PID int, meta Metadata, tunnelLog
 	var state LastKnownTunnels
 	tun := Tunnel{PID, asgnID, path, launchArgs, time.Now().UTC(), tunnelLog, meta}
 
-	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
+	rawState, err := ioutil.ReadFile("/tmp/sauced-state.json")
 	if err != nil {
 		logger.Disklog.Warn("Could not read from statefile: ", err)
 	}
-	if rawValue == nil {
+
+	// TODO can this be condensed so that we do the Unmarshall if rawState != nil ?
+	if rawState == nil {
 		state.Tunnels = append(state.Tunnels, tun)
 	} else {
-		json.Unmarshal(rawValue, &state)
+		json.Unmarshal(rawState, &state)
 		state.Tunnels = append(state.Tunnels, tun)
 	}
 
