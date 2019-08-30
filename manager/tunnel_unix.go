@@ -92,6 +92,21 @@ func StopTunnelByID(assignedID string) {
 	}
 
 }
+
+func StopTunnelsByPool(poolName string) {
+	tstate := GetLastKnownState()
+
+	tunnels, err := tstate.FindTunnelsByPool(poolName)
+
+	if err != nil {
+		logger.Disklog.Info(err)
+	} else {
+		for _, tunnel := range tunnels {
+			Stop(tunnel.PID)
+		}
+	}
+}
+
 // StopAll will send a kill or SIGINT signal
 // to all tunnels that are running.
 func StopAll() {
