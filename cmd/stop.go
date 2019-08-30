@@ -42,9 +42,9 @@ var stopCmd = &cobra.Command{
 		logger.Disklog.Debug("ID searched: ", id)
 
 		if all { // stop all tunnel regardless of other flags
-			logger.Disklog.Info("Stop command sent.  Stopping all tunnels.")
+			logger.Disklog.Info("Stop command sent. Stopping all tunnels.")
 			manager.StopAll()
-			logger.Disklog.Info("All tunnels sent the Kill, Interrupt, or SIGINT signal.  Sauced closing.")
+			logger.Disklog.Info("All tunnels sent the Kill, Interrupt, or SIGINT signal. Sauced closing.")
 		} else if pool == "" && id != "" { // id is the only one set
 			manager.StopTunnelByID(id)
 
