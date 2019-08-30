@@ -29,3 +29,37 @@ func showStateJSON() {
 	}
 	logger.Disklog.Info(string(lastJSON))
 }
+
+// ShowTunnelJSON is in charge getting state and searching for a single tunnel by ID.
+func ShowTunnelJSON(assignedID string) {
+	tstate := manager.GetLastKnownState()
+
+	tunnels, err := tstate.FindTunnelsByID(assignedID)
+
+	if err != nil {
+		logger.Disklog.Info(err)
+	} else {
+		tunnelsJSON, err := json.MarshalIndent(tunnels, "", "    ")
+		if err != nil {
+			logger.Disklog.Warnf("Could not format JSON with Indents: %v", err)
+		}
+		logger.Disklog.Info(string(tunnelsJSON))
+	}
+}
+
+// ShowPool is in charge getting state and searching for a pool of tunnels
+func ShowPool(poolName string) {
+	tstate := manager.GetLastKnownState()
+
+	tunnels, err := tstate.FindTunnelsByPool(poolName)
+
+	if err != nil {
+		logger.Disklog.Info(err)
+	} else {
+		tunnelsJSON, err := json.MarshalIndent(tunnels, "", "    ")
+		if err != nil {
+			logger.Disklog.Warnf("Could not format JSON with Indents: %v", err)
+		}
+		logger.Disklog.Info(string(tunnelsJSON))
+	}
+}

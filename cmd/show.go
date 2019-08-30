@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"github.com/mdsauce/sauced/logger"
+	"github.com/mdsauce/sauced/manager"
 	"github.com/mdsauce/sauced/output"
 	"github.com/spf13/cobra"
 )
@@ -26,17 +27,45 @@ var showCmd = &cobra.Command{
 	Short: "List all last known tunnels.",
 	Long:  `The tunnel state list will be pruned and then all active tunnels will be shown.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		human, err := cmd.Flags().GetBool("human")
+		//TODO: This should be it's function since it's called on all files.
+		logfile, err := cmd.Flags().GetString("logfile")
 		if err != nil {
-			logger.Disklog.Warn("Problem retrieving human flag", err)
+			logger.Disklog.Warn("Problem retrieving logfile flag", err)
 		}
-		output.PrintState(human)
+		logger.SetupLogfile(logfile)
+
+		pretty, err := cmd.Flags().GetBool("pretty")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving pretty flag", err)
+		}
+
+		logger.Disklog.Debug("show called by the user. Pruning then listing all tunnels.")
+		manager.PruneState()
+
+		pool, _ := cmd.Flags().GetString("pool")
+		id, _ := cmd.Flags().GetString("id")
+
+		logger.Disklog.Debug("Pool name searched: ", pool)
+		logger.Disklog.Debug("ID searched: ", id)
+
+		switch pretty {
+		case true:
+			output.PrettyPrint(id, pool)
+		case false:
+			if pool == "" && id != "" {
+				output.ShowTunnelJSON(id)
+			} else if pool == "" && id == "" {
+				output.ShowStateJSON()
+			} else {
+				output.ShowPool(pool)
+			}
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(showCmd)
-	showCmd.PersistentFlags().Bool("human", false, "output ")
+	showCmd.PersistentFlags().Bool("pretty", false, "pretty print the state")
 
 	// Here you will define your flags and configuration settings.
 
@@ -47,4 +76,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// showCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	showCmd.Flags().String("pool", "", "Pool name of tunnels. May return one or more results. Takes precedence over --id")
+	showCmd.Flags().String("id", "", "Assigned ID for a given tunnel.")
+
 }
