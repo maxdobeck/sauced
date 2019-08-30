@@ -39,24 +39,24 @@ var showCmd = &cobra.Command{
 			logger.Disklog.Warn("Problem retrieving pretty flag", err)
 		}
 
-		logger.Disklog.Debug("show called by the user. Pruning then listing all tunnels.")
 		manager.PruneState()
 
 		pool, _ := cmd.Flags().GetString("pool")
 		id, _ := cmd.Flags().GetString("id")
-
-		logger.Disklog.Debug("Pool name searched: ", pool)
-		logger.Disklog.Debug("ID searched: ", id)
 
 		switch pretty {
 		case true:
 			output.PrettyPrint(id, pool)
 		case false:
 			if pool == "" && id != "" {
+				logger.Disklog.Debug("ID searched: ", id)
 				output.ShowTunnelJSON(id)
 			} else if pool == "" && id == "" {
 				output.ShowStateJSON()
-			} else {
+			} else if pool != "" && id != "" {
+				logger.Disklog.Warn("Cannot search for both Pool and Tunnel ID.  Use --id OR --pool.")
+			} else if pool != "" && id == "" {
+				logger.Disklog.Debug("Pool searched: ", pool)
 				output.ShowPool(pool)
 			}
 		}
