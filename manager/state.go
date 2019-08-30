@@ -127,6 +127,7 @@ func RemoveTunnel(targetPID int) {
 // PruneState will access the state file and
 // remove any entries that are not found by the OS
 func PruneState() {
+	logger.Disklog.Debug("Pruning tunnels")
 	state := GetLastKnownState()
 	for i := 0; i < len(state.Tunnels); i++ {
 		tunnel := state.Tunnels[i]
