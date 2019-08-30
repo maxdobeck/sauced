@@ -9,12 +9,13 @@ import (
 
 // PrettyPrint is called by a user to output some sort of detailed info on the active tunnels
 func PrettyPrint(id string, pool string) {
+	state := manager.GetLastKnownState()
 	if id != "" {
-		prettyOutputTunnel(id)
+		showTunnelPretty(id, state)
 	} else if pool != "" {
-		prettyOutputPool(pool)
+		showPoolPretty(pool)
 	} else {
-		prettyOutputState()
+		showStatePretty()
 	}
 }
 
@@ -35,7 +36,7 @@ func ShowTunnelJSON(assignedID string) {
 	tunnels, err := tstate.FindTunnelsByID(assignedID)
 
 	if err != nil {
-		logger.Disklog.Info(err)
+		logger.Disklog.Warn(err, ", Tunnel Assigned ID: ", assignedID)
 	} else {
 		tunnelsJSON, err := json.MarshalIndent(tunnels, "", "    ")
 		if err != nil {
@@ -52,7 +53,7 @@ func ShowPool(poolName string) {
 	tunnels, err := tstate.FindTunnelsByPool(poolName)
 
 	if err != nil {
-		logger.Disklog.Info(err)
+		logger.Disklog.Warn(err, ", Pool Name: ", poolName)
 	} else {
 		tunnelsJSON, err := json.MarshalIndent(tunnels, "", "    ")
 		if err != nil {
