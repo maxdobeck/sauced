@@ -7,21 +7,19 @@ import (
 	"github.com/mdsauce/sauced/manager"
 )
 
-// PrintState is called by a user to output some sort of detailed info on the active tunnels
-func PrintState(human bool) {
-	if !human {
-		// print the default
-		logger.Disklog.Debug("show called by the user.  Pruning then listing all tunnels.")
-		manager.PruneState()
-		showStateJSON()
-	}
-	if human {
-		humanOutput()
+// PrettyPrint is called by a user to output some sort of detailed info on the active tunnels
+func PrettyPrint(id string, pool string) {
+	if id != "" {
+		prettyOutputTunnel(id)
+	} else if pool != "" {
+		prettyOutputPool(pool)
+	} else {
+		prettyOutputState()
 	}
 }
 
-// showStateJSON will pretty print JSON
-func showStateJSON() {
+// ShowStateJSON will pretty print JSON
+func ShowStateJSON() {
 	last := manager.GetLastKnownState()
 	lastJSON, err := json.MarshalIndent(last, "", "    ")
 	if err != nil {
