@@ -33,10 +33,6 @@ var stopCmd = &cobra.Command{
 		}
 		logger.SetupLogfile(logfile)
 
-		logger.Disklog.Info("Stop command sent.  Stopping all tunnels.")
-		manager.StopAll()
-		logger.Disklog.Info("All tunnels sent the Kill, Interrupt, or SIGINT signal.  Sauced closing.")
-
 		pool, _ := cmd.Flags().GetString("pool")
 		id, _ := cmd.Flags().GetString("id")
 		all, _ := cmd.Flags().GetBool("all")
@@ -45,12 +41,22 @@ var stopCmd = &cobra.Command{
 		logger.Disklog.Debug("Pool name searched: ", pool)
 		logger.Disklog.Debug("ID searched: ", id)
 
-		if pool == "" && id != "" {
-
-		} else if pool == "" && id == "" {
-
+		if all { // stop all tunnel regardless of other flags
+			logger.Disklog.Info("Stop command sent.  Stopping all tunnels.")
+			manager.StopAll()
+			logger.Disklog.Info("All tunnels sent the Kill, Interrupt, or SIGINT signal.  Sauced closing.")
+		} else if pool == "" && id != "" { // id is the only one set
+			// find tunnel by ID
+			// get pid
+			// stop tunnel
+			// remove tunnel from state
+		} else if pool != "" { // delete pool. doesn't matter if id is set too
+			// find tunnel(s) by pool
+			// get pid(s)
+			// stop tunnel(s)
+			// remove tunnel(s) from state
 		} else {
-
+			logger.Disklog.Error("No flag was added. Please use -h for options")
 		}
 
 	},
