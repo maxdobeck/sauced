@@ -13,9 +13,9 @@ func PrettyPrint(id string, pool string) {
 	if id != "" {
 		showTunnelPretty(id, state)
 	} else if pool != "" {
-		showPoolPretty(pool)
+		showPoolPretty(pool, state)
 	} else {
-		showStatePretty()
+		showStatePretty(state)
 	}
 }
 
