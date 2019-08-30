@@ -29,6 +29,14 @@ type Tunnel struct {
 	Metadata   Metadata  `json:"metadata"`
 }
 
+// Empty returns true if there are no tunnels, false if one ore more tunnels are present
+func (tState LastKnownTunnels) Empty() bool {
+	if len(tState.Tunnels) == 0 {
+		return true
+	}
+	return false
+}
+
 // add later
 // func (tun Tunnel) rotateLog() error {
 // 	return nil
