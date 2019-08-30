@@ -46,19 +46,8 @@ var stopCmd = &cobra.Command{
 			manager.StopAll()
 			logger.Disklog.Info("All tunnels sent the Kill, Interrupt, or SIGINT signal.  Sauced closing.")
 		} else if pool == "" && id != "" { // id is the only one set
-			tstate := manager.GetLastKnownState()
+			manager.StopTunnelByID(id)
 
-			tunnel, err := tstate.FindTunnelByID(id)
-
-			if err != nil {
-				logger.Disklog.Info(err)
-			} else {
-				// find tunnel by ID
-				// get pid
-				// stop tunnel
-				// remove tunnel from state
-
-			}
 		} else if pool != "" { // delete pool. doesn't matter if id is set too
 			// find tunnel(s) by pool
 			// get pid(s)
