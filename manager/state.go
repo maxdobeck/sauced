@@ -11,8 +11,7 @@ import (
 	"github.com/mdsauce/sauced/logger"
 )
 
-// LastKnownTunnels will a json object with
-// all tunnels that were previously known to be alive
+// LastKnownTunnels is a slice of all tunnels found in the statefile
 type LastKnownTunnels struct {
 	Tunnels []Tunnel `json:"tunnels"`
 }
