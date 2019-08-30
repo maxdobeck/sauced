@@ -26,6 +26,13 @@ var stopCmd = &cobra.Command{
 	Short: "Stop all running tunnels and close this program.",
 	Long:  `Use the last known tunnel state to stop all tunnels.  This process will close after SIGINT or kill signal has been deliverd to all tunnels.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		//TODO: This should be it's function since it's called on all files.
+		logfile, err := cmd.Flags().GetString("logfile")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving logfile flag", err)
+		}
+		logger.SetupLogfile(logfile)
+
 		logger.Disklog.Info("Stop command sent.  Stopping all tunnels.")
 		manager.StopAll()
 		logger.Disklog.Info("All tunnels sent the Kill, Interrupt, or SIGINT signal.  Sauced closing.")
