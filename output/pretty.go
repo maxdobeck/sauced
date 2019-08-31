@@ -51,15 +51,14 @@ func noTunnels() {
 }
 
 func printTunnel(t manager.Tunnel) {
-	log.Println("\nTunnel Found")
+	log.Print("Tunnel Found")
 	log.Println("------------")
 	log.Println("PID: ", t.PID)
 	log.Println("Assigned ID: ", t.AssignedID)
-	log.Println("Name: ", t.Metadata.Pool)
+	log.Println("Pool Name: ", t.Metadata.Pool)
 	log.Println("Tunnel Log Location: ", t.Log)
 	//convert to local OS timezone and humanize
 	// t.LaunchTime
 	log.Println("Owner: ", t.Metadata.Owner)
-	log.Println("Pool Size: ", t.Metadata.Size)
-	log.Println()
+	log.Print("Pool Size: ", t.Metadata.Size, "\n\n")
 }
