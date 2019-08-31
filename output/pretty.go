@@ -44,7 +44,7 @@ func showStatePretty(state manager.LastKnownTunnels) {
 }
 
 func noTunnels() {
-	log.Printf("\nNo tunnels are running right now!\n\n")
+	log.Print("No tunnels are running right now!\n\n")
 	log.Println("Tunnels:")
 	log.Println("--------")
 	log.Print("None\n\n")
