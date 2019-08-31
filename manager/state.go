@@ -71,8 +71,8 @@ func (tState LastKnownTunnels) FindTunnelsByPool(poolName string) ([]Tunnel, err
 	return tunnels, nil
 }
 
-// FindTunnelsByID gets a tunnel ID and returns a tunnel
-func (tState LastKnownTunnels) FindTunnelsByID(assignedID string) (Tunnel, error) {
+// FindTunnelByID gets a tunnel ID and returns a tunnel
+func (tState LastKnownTunnels) FindTunnelByID(assignedID string) (Tunnel, error) {
 	var tunnel Tunnel
 	for i := 0; i < len(tState.Tunnels); i++ {
 		tunnel = tState.Tunnels[i]
