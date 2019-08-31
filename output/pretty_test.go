@@ -1,6 +1,9 @@
 package output
 
 import (
+	"bytes"
+	"log"
+	"strings"
 	"testing"
 	"time"
 
@@ -11,12 +14,24 @@ import (
 func TestPrettyStateFindsTunnel(t *testing.T) {
 	target := "test123"
 	state := soloState(target)
+
+	var buf bytes.Buffer
+	//log in this case is the log used by the Testing package
+	log.SetOutput(&buf)
+
 	showStatePretty(state)
+
+	if strings.Contains(buf.String(), target) == false {
+		t.Log(state)
+		t.Log(buf.String())
+		t.Fail()
+	}
+
 }
 
 //TestPrettyStatePrintsEmpty confirms that empty Tunnels[] can be identified as such
 func TestPrettyStatePrintsEmpty(t *testing.T) {
-	state := emptystate()
+	state := emptyState()
 	showStatePretty(state)
 }
 
@@ -38,7 +53,7 @@ func soloState(target string) manager.LastKnownTunnels {
 	return state
 }
 
-func emptystate() manager.LastKnownTunnels {
+func emptyState() manager.LastKnownTunnels {
 	var state manager.LastKnownTunnels
 	return state
 }
