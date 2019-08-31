@@ -26,7 +26,7 @@ var stopCmd = &cobra.Command{
 	Short: "Stop all running tunnels and close this program.",
 	Long:  `Use the last known tunnel state to stop all tunnels.  This process will close after SIGINT or kill signal has been deliverd to all tunnels.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//TODO: This should be it's function since it's called on all files.
+		//TODO: This should be it's own function since it's called on all files.
 		logfile, err := cmd.Flags().GetString("logfile")
 		if err != nil {
 			logger.Disklog.Warn("Problem retrieving logfile flag", err)
@@ -37,20 +37,21 @@ var stopCmd = &cobra.Command{
 		id, _ := cmd.Flags().GetString("id")
 		all, _ := cmd.Flags().GetBool("all")
 
-		logger.Disklog.Debugf("All flag: %t", all)
-		logger.Disklog.Debugf("Pool name searched: %s", pool)
-		logger.Disklog.Debugf("ID searched: %s", id)
-
 		if all { // stop all tunnel regardless of other flags
+			logger.Disklog.Debugf("All flag: %t", all)
 			logger.Disklog.Info("Stopping all tunnels.")
 			manager.StopAll()
 			logger.Disklog.Info("All tunnels sent the Kill, Interrupt, or SIGINT signal. Sauced closing.")
 		} else if pool == "" && id != "" { // id is the only one set
+			logger.Disklog.Debugf("ID searched: %s", id)
 			logger.Disklog.Infof("Stopping tunnel ID: %s", id)
 			manager.StopTunnelByID(id)
 			logger.Disklog.Infof("Tunnel stopped")
 
+		} else if pool != "" && id != "" { // stop unexepected behavior.  technically possible to kill a tunnel AND a pool but keep it safe for now till further testing has been completed
+			logger.Disklog.Warn("You specified both --id and --pool.  Please only specify one.")
 		} else if pool != "" { // delete pool. doesn't matter if id is set too
+			logger.Disklog.Debugf("Pool name searched: %s", pool)
 			logger.Disklog.Infof("Stopping tunnel pool: %s", pool)
 			manager.StopTunnelsByPool(pool)
 			logger.Disklog.Infof("Tunnel pool stopped")
