@@ -7,13 +7,14 @@ import (
 	"github.com/mdsauce/sauced/manager"
 )
 
-//TestPrettyState tests the
+//TestPrettyStateFindsTunnel confirms that the target tunnel can be located
 func TestPrettyStateFindsTunnel(t *testing.T) {
 	target := "test123"
 	state := soloState(target)
 	showStatePretty(state)
 }
 
+//TestPrettyStatePrintsEmpty confirms that empty Tunnels[] can be identified as such
 func TestPrettyStatePrintsEmpty(t *testing.T) {
 	state := emptystate()
 	showStatePretty(state)
