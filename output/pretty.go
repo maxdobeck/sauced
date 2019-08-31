@@ -24,6 +24,13 @@ func showPoolPretty(pool string, state manager.LastKnownTunnels) {
 		noTunnels()
 		return
 	}
+	tunnels, err := state.FindTunnelsByPool(pool)
+	if err != nil {
+		logger.Disklog.Warn("Problem searching for tunnels for specific pool", " , ", pool, err)
+	}
+	for _, tunnel := range tunnels {
+		printTunnel(tunnel)
+	}
 }
 
 func showStatePretty(state manager.LastKnownTunnels) {
