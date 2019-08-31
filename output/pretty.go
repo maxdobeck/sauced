@@ -12,7 +12,7 @@ func showTunnelPretty(ID string, state manager.LastKnownTunnels) {
 		noTunnels()
 		return
 	}
-	tunnel, err := state.FindTunnelsByID(ID)
+	tunnel, err := state.FindTunnelByID(ID)
 	if err != nil {
 		logger.Disklog.Warn("Problem searching Statefile for tunnel", " , ", ID, err)
 	}
