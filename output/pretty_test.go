@@ -22,8 +22,8 @@ func TestPrettyStateFindsTunnel(t *testing.T) {
 	showStatePretty(state)
 
 	if strings.Contains(buf.String(), target) == false {
-		t.Log(state)
-		t.Log(buf.String())
+		t.Log("Current tunnels state: ", state)
+		t.Log("Output from func under test: ", buf.String())
 		t.Fail()
 	}
 
@@ -32,7 +32,17 @@ func TestPrettyStateFindsTunnel(t *testing.T) {
 //TestPrettyStatePrintsEmpty confirms that empty Tunnels[] can be identified as such
 func TestPrettyStatePrintsEmpty(t *testing.T) {
 	state := emptyState()
+
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+
 	showStatePretty(state)
+
+	if strings.Contains(buf.String(), "No tunnels are running right now!") == false {
+		t.Log("Current tunnels state: ", state)
+		t.Log("Output from func under test: ", buf.String())
+		t.Fail()
+	}
 }
 
 func soloState(target string) manager.LastKnownTunnels {

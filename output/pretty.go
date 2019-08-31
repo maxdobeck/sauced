@@ -1,7 +1,7 @@
 package output
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/mdsauce/sauced/logger"
 	"github.com/mdsauce/sauced/manager"
@@ -31,25 +31,28 @@ func showStatePretty(state manager.LastKnownTunnels) {
 		noTunnels()
 		return
 	}
+	for _, tunnel := range state.Tunnels {
+		printTunnel(tunnel)
+	}
 }
 
 func noTunnels() {
-	fmt.Printf("\nNo tunnels are running right now!\n\n")
-	fmt.Println("Tunnels:")
-	fmt.Println("--------")
-	fmt.Print("None\n\n")
+	log.Printf("\nNo tunnels are running right now!\n\n")
+	log.Println("Tunnels:")
+	log.Println("--------")
+	log.Print("None\n\n")
 }
 
 func printTunnel(t manager.Tunnel) {
-	fmt.Println("\nTunnel Found")
-	fmt.Println("------------")
-	fmt.Println("PID: ", t.PID)
-	fmt.Println("Assigned ID: ", t.AssignedID)
-	fmt.Println("Name: ", t.Metadata.Pool)
-	fmt.Println("Tunnel Log Location: ", t.Log)
+	log.Println("\nTunnel Found")
+	log.Println("------------")
+	log.Println("PID: ", t.PID)
+	log.Println("Assigned ID: ", t.AssignedID)
+	log.Println("Name: ", t.Metadata.Pool)
+	log.Println("Tunnel Log Location: ", t.Log)
 	//convert to local OS timezone and humanize
 	// t.LaunchTime
-	fmt.Println("Owner: ", t.Metadata.Owner)
-	fmt.Println("Pool Size: ", t.Metadata.Size)
-	fmt.Println()
+	log.Println("Owner: ", t.Metadata.Owner)
+	log.Println("Pool Size: ", t.Metadata.Size)
+	log.Println()
 }
