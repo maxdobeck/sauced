@@ -26,9 +26,39 @@ var stopCmd = &cobra.Command{
 	Short: "Stop all running tunnels and close this program.",
 	Long:  `Use the last known tunnel state to stop all tunnels.  This process will close after SIGINT or kill signal has been deliverd to all tunnels.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Disklog.Info("Stop command sent.  Stopping all tunnels.")
-		manager.StopAll()
-		logger.Disklog.Info("All tunnels sent the Kill, Interrupt, or SIGINT signal.  Sauced closing.")
+		//TODO: This should be it's function since it's called on all files.
+		logfile, err := cmd.Flags().GetString("logfile")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving logfile flag", err)
+		}
+		logger.SetupLogfile(logfile)
+
+		pool, _ := cmd.Flags().GetString("pool")
+		id, _ := cmd.Flags().GetString("id")
+		all, _ := cmd.Flags().GetBool("all")
+
+		logger.Disklog.Debugf("All flag: %t", all)
+		logger.Disklog.Debugf("Pool name searched: %s", pool)
+		logger.Disklog.Debugf("ID searched: %s", id)
+
+		if all { // stop all tunnel regardless of other flags
+			logger.Disklog.Info("Stopping all tunnels.")
+			manager.StopAll()
+			logger.Disklog.Info("All tunnels sent the Kill, Interrupt, or SIGINT signal. Sauced closing.")
+		} else if pool == "" && id != "" { // id is the only one set
+			logger.Disklog.Infof("Stopping tunnel ID: %s", id)
+			manager.StopTunnelByID(id)
+			logger.Disklog.Infof("Tunnel stopped")
+
+		} else if pool != "" { // delete pool. doesn't matter if id is set too
+			logger.Disklog.Infof("Stopping tunnel pool: %s", pool)
+			manager.StopTunnelsByPool(pool)
+			logger.Disklog.Infof("Tunnel pool stopped")
+
+		} else {
+			logger.Disklog.Error("No flag was added. Please use -h for options")
+		}
+
 	},
 }
 
@@ -44,4 +74,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// stopCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	stopCmd.Flags().String("pool", "", "Pool name of tunnels. May return one or more results. Takes precedence over --id")
+	stopCmd.Flags().String("id", "", "Assigned ID for a given tunnel.")
+	stopCmd.Flags().Bool("all", false, "Allows stopping all active tunnels. Takes precedence over all other flags.")
 }

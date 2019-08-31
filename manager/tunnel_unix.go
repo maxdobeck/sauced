@@ -75,7 +75,35 @@ func Stop(Pid int) {
 		}
 		// Only amend statefile if there wasn't an error
 		if err == nil {
+			logger.Disklog.Debugf("Removing tunnel PID %v from statefile", Pid)
 			RemoveTunnel(Pid)
+		}
+	}
+}
+
+// StopTunnelByID will stop a single tunnel that matches a given ID
+func StopTunnelByID(assignedID string) {
+	tstate := GetLastKnownState()
+	tunnel, err := tstate.FindTunnelByID(assignedID)
+
+	if err != nil {
+		logger.Disklog.Info(err)
+	} else {
+		Stop(tunnel.PID)
+	}
+
+}
+
+// StopTunnelsByPool will stop a tunnel pool matching the given pool name
+func StopTunnelsByPool(poolName string) {
+	tstate := GetLastKnownState()
+	tunnels, err := tstate.FindTunnelsByPool(poolName)
+
+	if err != nil {
+		logger.Disklog.Info(err)
+	} else {
+		for _, tunnel := range tunnels {
+			Stop(tunnel.PID)
 		}
 	}
 }

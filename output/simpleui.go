@@ -21,16 +21,16 @@ func ShowStateJSON() {
 func ShowTunnelJSON(assignedID string) {
 	tstate := manager.GetLastKnownState()
 
-	tunnels, err := tstate.FindTunnelsByID(assignedID)
+	tunnel, err := tstate.FindTunnelByID(assignedID)
 
 	if err != nil {
 		logger.Disklog.Info(err)
 	} else {
-		tunnelsJSON, err := json.MarshalIndent(tunnels, "", "    ")
+		tunnelJSON, err := json.MarshalIndent(tunnel, "", "    ")
 		if err != nil {
 			logger.Disklog.Warnf("Could not format JSON with Indents: %v", err)
 		}
-		logger.Disklog.Info(string(tunnelsJSON))
+		logger.Disklog.Info(string(tunnelJSON))
 	}
 }
 
