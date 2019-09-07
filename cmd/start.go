@@ -73,6 +73,7 @@ var startCmd = &cobra.Command{
 				go manager.Start(fscanner.Text(), &wg, meta[pool])
 			}
 		}
+		// TODO catch the ctrl-c here if it comes.
 		wg.Wait()
 	},
 }

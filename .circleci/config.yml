@@ -10,3 +10,6 @@ jobs:
       - run: go build -ldflags "-X github.com/mdsauce/sauced/cmd.CurVersion=`git rev-parse --short HEAD`"
       - run: ./sauced --help
       - run: ./sauced --version
+      - run: ./sauced show --pretty
+      - run: ./sauced show --id test-tunnel
+      - run: ./sauced show --pool test-pool

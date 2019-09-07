@@ -23,13 +23,15 @@ func TestSCStarts(t *testing.T) {
 
 // TestSCFailsOnBadInput asserts that only an actual argument to SC can start a tunnel
 func TestSCFailsOnBadInput(t *testing.T) {
-	scBinary := "/some/fake/path"
+	badPath := "/some/fake/path"
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go Start(scBinary, &wg, Metadata{})
+	go Start(badPath, &wg, Metadata{})
+	PruneState()
 	tunnels := GetLastKnownState()
-	if len(tunnels.Tunnels) != 0 {
-		t.Fail()
+	if tunnels.Empty() == false {
+		t.Log(tunnels.Tunnels)
+		t.Error("Tunnels started even with scBinary path: ", badPath)
 	}
 	StopAll()
 }

@@ -7,6 +7,18 @@ import (
 	"github.com/mdsauce/sauced/manager"
 )
 
+// PrettyPrint is called by a user to output some sort of detailed info on the active tunnels
+func PrettyPrint(id string, pool string) {
+	state := manager.GetLastKnownState()
+	if id != "" {
+		showTunnelPretty(id, state)
+	} else if pool != "" {
+		showPoolPretty(pool, state)
+	} else {
+		showStatePretty(state)
+	}
+}
+
 // ShowStateJSON will pretty print JSON
 func ShowStateJSON() {
 	last := manager.GetLastKnownState()
@@ -24,7 +36,7 @@ func ShowTunnelJSON(assignedID string) {
 	tunnel, err := tstate.FindTunnelByID(assignedID)
 
 	if err != nil {
-		logger.Disklog.Info(err)
+		logger.Disklog.Warn(err, ", Tunnel Assigned ID: ", assignedID)
 	} else {
 		tunnelJSON, err := json.MarshalIndent(tunnel, "", "    ")
 		if err != nil {
@@ -41,7 +53,7 @@ func ShowPool(poolName string) {
 	tunnels, err := tstate.FindTunnelsByPool(poolName)
 
 	if err != nil {
-		logger.Disklog.Info(err)
+		logger.Disklog.Warn(err, ", Pool Name: ", poolName)
 	} else {
 		tunnelsJSON, err := json.MarshalIndent(tunnels, "", "    ")
 		if err != nil {

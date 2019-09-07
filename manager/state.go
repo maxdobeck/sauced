@@ -11,14 +11,12 @@ import (
 	"github.com/mdsauce/sauced/logger"
 )
 
-// LastKnownTunnels will a json object with
-// all tunnels that were previously known to be alive
+// LastKnownTunnels is a slice of all tunnels found in the statefile
 type LastKnownTunnels struct {
 	Tunnels []Tunnel `json:"tunnels"`
 }
 
-// Tunnel is a json representation
-// of an OS process after SC has launched
+// Tunnel is a logical representation of a Sauce Connect tunnel once it has started on an OS
 type Tunnel struct {
 	PID        int       `json:"pid"`
 	AssignedID string    `json:"assignedID"`
@@ -27,6 +25,14 @@ type Tunnel struct {
 	LaunchTime time.Time `json:"launchtime"`
 	Log        string    `json:"log"`
 	Metadata   Metadata  `json:"metadata"`
+}
+
+// Empty returns true if there are no tunnels, false if one ore more tunnels are present
+func (tState LastKnownTunnels) Empty() bool {
+	if len(tState.Tunnels) == 0 {
+		return true
+	}
+	return false
 }
 
 // add later
@@ -86,16 +92,18 @@ func AddTunnel(launchArgs string, path string, PID int, meta Metadata, tunnelLog
 	createIPCFile()
 
 	var state LastKnownTunnels
-	tun := Tunnel{PID, asgnID, path, launchArgs, time.Now().UTC(), tunnelLog, meta}
+	tun := Tunnel{PID, asgnID, path, launchArgs, time.Now().In(time.Local), tunnelLog, meta}
 
-	rawValue, err := ioutil.ReadFile("/tmp/sauced-state.json")
+	rawState, err := ioutil.ReadFile("/tmp/sauced-state.json")
 	if err != nil {
 		logger.Disklog.Warn("Could not read from statefile: ", err)
 	}
-	if rawValue == nil {
+
+	// TODO can this be condensed so that we do the Unmarshall if rawState != nil ?
+	if rawState == nil {
 		state.Tunnels = append(state.Tunnels, tun)
 	} else {
-		json.Unmarshal(rawValue, &state)
+		json.Unmarshal(rawState, &state)
 		state.Tunnels = append(state.Tunnels, tun)
 	}
 
@@ -119,6 +127,7 @@ func RemoveTunnel(targetPID int) {
 // PruneState will access the state file and
 // remove any entries that are not found by the OS
 func PruneState() {
+	logger.Disklog.Debug("Pruning tunnels")
 	state := GetLastKnownState()
 	for i := 0; i < len(state.Tunnels); i++ {
 		tunnel := state.Tunnels[i]

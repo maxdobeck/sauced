@@ -18,7 +18,6 @@ import (
 	"github.com/mdsauce/sauced/logger"
 	"github.com/mdsauce/sauced/manager"
 	"github.com/mdsauce/sauced/output"
-
 	"github.com/spf13/cobra"
 )
 
@@ -35,28 +34,38 @@ var showCmd = &cobra.Command{
 		}
 		logger.SetupLogfile(logfile)
 
-		logger.Disklog.Debug("show called by the user. Pruning then listing all tunnels.")
+		pretty, err := cmd.Flags().GetBool("pretty")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving pretty flag", err)
+		}
+
 		manager.PruneState()
 
 		pool, _ := cmd.Flags().GetString("pool")
 		id, _ := cmd.Flags().GetString("id")
 
-		logger.Disklog.Debug("Pool name searched: ", pool)
-		logger.Disklog.Debug("ID searched: ", id)
-
-		if pool == "" && id != "" {
-			output.ShowTunnelJSON(id)
-		} else if pool == "" && id == "" {
-			output.ShowStateJSON()
-		} else {
-			output.ShowPool(pool)
+		switch pretty {
+		case true:
+			output.PrettyPrint(id, pool)
+		case false:
+			if pool == "" && id != "" {
+				logger.Disklog.Debug("ID searched: ", id)
+				output.ShowTunnelJSON(id)
+			} else if pool == "" && id == "" {
+				output.ShowStateJSON()
+			} else if pool != "" && id != "" {
+				logger.Disklog.Warn("Cannot search for both Pool and Tunnel ID.  Use --id OR --pool.")
+			} else if pool != "" && id == "" {
+				logger.Disklog.Debug("Pool searched: ", pool)
+				output.ShowPool(pool)
+			}
 		}
-
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(showCmd)
+	showCmd.PersistentFlags().Bool("pretty", false, "pretty print the state")
 
 	// Here you will define your flags and configuration settings.
 
