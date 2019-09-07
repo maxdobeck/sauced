@@ -92,7 +92,7 @@ func AddTunnel(launchArgs string, path string, PID int, meta Metadata, tunnelLog
 	createIPCFile()
 
 	var state LastKnownTunnels
-	tun := Tunnel{PID, asgnID, path, launchArgs, time.Now().UTC(), tunnelLog, meta}
+	tun := Tunnel{PID, asgnID, path, launchArgs, time.Now().In(time.Local), tunnelLog, meta}
 
 	rawState, err := ioutil.ReadFile("/tmp/sauced-state.json")
 	if err != nil {
