@@ -79,7 +79,7 @@ var startCmd = &cobra.Command{
 		signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 		go func() {
 			<-stop
-			logger.Disklog.Debug("User pressed ctrl-c.")
+			logger.Disklog.Warn("User pressed ctrl-c. Hard killing tunnels now.  Jobs may die.")
 			manager.StopAll()
 		}()
 		wg.Wait()
