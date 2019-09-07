@@ -114,5 +114,6 @@ func StopAll() {
 	last := GetLastKnownState()
 	for _, tunnel := range last.Tunnels {
 		Stop(tunnel.PID)
+		// add a stop via REST API func here.  So rest api gets signal as well.
 	}
 }

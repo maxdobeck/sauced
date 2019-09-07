@@ -20,6 +20,7 @@ import (
 	"os/signal"
 	"path"
 	"sync"
+	"syscall"
 
 	"github.com/mdsauce/sauced/logger"
 	"github.com/mdsauce/sauced/manager"
@@ -64,22 +65,22 @@ var startCmd = &cobra.Command{
 		// read in the sc startup commands
 		file, _ := os.Open(configFile)
 		fscanner := bufio.NewScanner(file)
-		c := make(chan os.Signal, 1)
+		stop := make(chan os.Signal, 1)
 		for fscanner.Scan() {
 			if fscanner.Text() != "" || len(fscanner.Text()) != 0 {
 				wg.Add(1)
-				c := make(chan string)
-				go manager.PoolName(fscanner.Text(), c)
-				pool := <-c
+				metadata := make(chan string)
+				go manager.PoolName(fscanner.Text(), metadata)
+				pool := <-metadata
 				logger.Disklog.Debugf("%s pool is %s.  Metadata is %v", fscanner.Text(), pool, meta[pool])
 				go manager.Start(fscanner.Text(), &wg, meta[pool])
 			}
 		}
-		signal.Notify(c, os.Interrupt)
+		signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 		go func() {
-			<-c
+			<-stop
+			logger.Disklog.Debug("User pressed ctrl-c.")
 			manager.StopAll()
-			os.Exit(0)
 		}()
 		wg.Wait()
 	},
