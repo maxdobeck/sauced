@@ -23,7 +23,7 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 	}
 
 	if vacancy(meta) != true {
-		logger.Disklog.Infof("Too many tunnels open.  Not opening %s \n %v", meta.Pool, launchArgs)
+		logger.Disklog.Warnf("Too many tunnels open.  Not opening %s \n %v", meta.Pool, launchArgs)
 		return
 	}
 	scCmd := exec.Command(path, args[1:]...)
@@ -60,6 +60,7 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta, tunLog, asgnID)
 		}
 	}
+	logger.Disklog.Infof("Sauce Connect client with PID %d shutting down!  Goodbye!", scCmd.Process.Pid)
 	defer scCmd.Wait()
 }
 
@@ -114,5 +115,6 @@ func StopAll() {
 	last := GetLastKnownState()
 	for _, tunnel := range last.Tunnels {
 		Stop(tunnel.PID)
+		// add a stop via REST API func here.  So rest api gets signal as well.
 	}
 }

@@ -89,8 +89,8 @@ func (tState LastKnownTunnels) FindTunnelByID(assignedID string) (Tunnel, error)
 // AddTunnel will record the state of the tunnel
 // to the IPC file after the tunnel has launched as an OS process
 func AddTunnel(launchArgs string, path string, PID int, meta Metadata, tunnelLog string, asgnID string) {
-	createIPCFile()
-
+	createIPCFile(PID)
+	// TODO Obtain a lock on the file THEN add to the statefile
 	var state LastKnownTunnels
 	tun := Tunnel{PID, asgnID, path, launchArgs, time.Now().In(time.Local), tunnelLog, meta}
 
@@ -162,9 +162,9 @@ func GetLastKnownState() LastKnownTunnels {
 	return state
 }
 
-func createIPCFile() {
+func createIPCFile(PID int) {
 	if _, err := os.Stat("/tmp/sauced-state.json"); err == nil {
-		logger.Disklog.Debug("Found state file /tmp/sauced-state.json")
+		logger.Disklog.Debugf("Process %d found state file /tmp/sauced-state.json", PID)
 	} else if os.IsNotExist(err) {
 		logger.Disklog.Info("/tmp/sauced-state.json not found ", err)
 		file, err := os.OpenFile("/tmp/sauced-state.json", os.O_CREATE|os.O_WRONLY, 0755)
