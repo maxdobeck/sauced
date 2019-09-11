@@ -15,6 +15,7 @@ import (
 // Start creates a new tunnel
 func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 	defer wg.Done()
+
 	args := strings.Split(launchArgs, " ")
 	path := args[0]
 
@@ -61,6 +62,7 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 		}
 	}
 	logger.Disklog.Infof("Sauce Connect client with PID %d shutting down!  Goodbye!", scCmd.Process.Pid)
+	RemoveTunnel(scCmd.Process.Pid)
 	defer scCmd.Wait()
 }
 
@@ -73,11 +75,6 @@ func Stop(Pid int) {
 		err := tunnel.Signal(os.Interrupt)
 		if err != nil {
 			logger.Disklog.Warnf("Problem killing Process %d %v.  The user may not have permissions to send a SIGINT or SIGKILL to the listed process.", Pid, err)
-		}
-		// Only amend statefile if there wasn't an error
-		if err == nil {
-			logger.Disklog.Debugf("Removing tunnel PID %v from statefile", Pid)
-			RemoveTunnel(Pid)
 		}
 	}
 }
