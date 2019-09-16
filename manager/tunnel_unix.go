@@ -12,17 +12,15 @@ import (
 	"github.com/mdsauce/sauced/logger"
 )
 
-// Start creates a new tunnel
+// Start creates a new tunnel from the metadata and launch arguments
 func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 	defer wg.Done()
-
 	args := strings.Split(launchArgs, " ")
 	path := args[0]
 
 	if eatLine(path) {
 		return
 	}
-
 	if vacancy(meta) != true {
 		logger.Disklog.Warnf("Too many tunnels open.  Not opening %s \n %v", meta.Pool, launchArgs)
 		return
