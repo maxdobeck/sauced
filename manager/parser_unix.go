@@ -4,6 +4,8 @@ import (
 	"math/rand"
 	"os"
 	"strings"
+
+	"github.com/mdsauce/sauced/logger"
 )
 
 func eatLine(line string) bool {
@@ -54,6 +56,18 @@ func addDefaults(tunnelArgs []string) []string {
 			logfile = true
 		}
 	}
+	_, noFile := os.Stat("/tmp/sauceconnect")
+	if noFile != nil {
+		if os.IsNotExist(noFile) {
+			err := os.Mkdir("/tmp/sauceconnect", 0744)
+			if err != nil {
+				logger.Disklog.Error("Could not make default directory /tmp/sauceconnect: ", err)
+			}
+		}
+	} else if noFile == nil {
+		logger.Disklog.Debug("Found /tmp/sauceconnect.  Adding Defaults to launch args")
+	}
+
 	if !verbose {
 		tunnelArgs = append(tunnelArgs, "-v")
 	}
