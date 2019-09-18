@@ -25,6 +25,10 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 		logger.Disklog.Warnf("Too many tunnels open.  Not opening %s \n %v", meta.Pool, launchArgs)
 		return
 	}
+	// setDefaults() should go here.  take launchArgs and add all necessary default args/flags.
+	manufacturedArgs := setDefaults(args)
+	logger.Disklog.Debug("Created new set of args with sensible defaults that will be passed to exec.Command: ", manufacturedArgs)
+	// tunnel is actually launched here.  new process is spawned
 	scCmd := exec.Command(path, args[1:]...)
 	stdout, _ := scCmd.StdoutPipe()
 	err := scCmd.Start()
