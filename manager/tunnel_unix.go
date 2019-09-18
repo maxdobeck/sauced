@@ -29,7 +29,7 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 	manufacturedArgs := setDefaults(args)
 	logger.Disklog.Debug("Created new set of args with sensible defaults that will be passed to exec.Command: ", manufacturedArgs)
 	// tunnel is actually launched here.  new process is spawned
-	scCmd := exec.Command(path, args[1:]...)
+	scCmd := exec.Command(path, manufacturedArgs[1:]...)
 	stdout, _ := scCmd.StdoutPipe()
 	err := scCmd.Start()
 	if err != nil {

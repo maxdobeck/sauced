@@ -73,7 +73,7 @@ func addDefaults(tunnelArgs []string) []string {
 	}
 	if !pidfile {
 		tunnelArgs = append(tunnelArgs, "--pidfile")
-		pidfileString := "/tmp/sauceconnect/" + randomString(5)
+		pidfileString := "/tmp/sauceconnect/" + randomString(5) + ".pid"
 		tunnelArgs = append(tunnelArgs, pidfileString)
 	}
 	if !haMode {
