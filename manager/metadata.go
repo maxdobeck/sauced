@@ -25,15 +25,8 @@ func CollectMetadata(config string) map[string]Metadata {
 	fscanner := bufio.NewScanner(file)
 	for fscanner.Scan() {
 		if fscanner.Text() != "" || len(fscanner.Text()) != 0 {
-			pool := make(chan string)
-			owner := make(chan string)
-			go PoolName(fscanner.Text(), pool)
-			go getOwner(fscanner.Text(), owner)
-			// use channels here to wait for the string data to return
-			// silently return and fail if getOwner() fails
-			tunnelName := <-pool
-			username := <-owner
-
+			tunnelName := PoolName(fscanner.Text())
+			username := GetOwner(fscanner.Text())
 			// then add to the metadata map.  And increment the Size as needed
 			if val, ok := meta[tunnelName]; ok {
 				val.Size = val.Size + 1
@@ -49,26 +42,27 @@ func CollectMetadata(config string) map[string]Metadata {
 }
 
 // PoolName takes the launchArgs and returns the
-// tunnel name to the channel, if no name returns 'anonymous'
-func PoolName(launchArgs string, pool chan string) {
+// tunnel name, if no name returns 'anonymous'
+func PoolName(launchArgs string) string {
 	//return the -i flag or anonymous if there is no name
 	args := strings.Split(launchArgs, " ")
 	for index, arg := range args {
 		if arg == "-i" || arg == "--tunnel-identifier" {
-			pool <- args[index+1]
+			return args[index+1]
 		}
 	}
-	pool <- "anonymous"
+	return "anonymous"
 }
 
-func getOwner(launchArgs string, owner chan string) {
+// GetOwner takes the launch args and returns the owner of said tunnel if username flag is present
+func GetOwner(launchArgs string) string {
 	//return the user that owns this tunnel.
 	//err and return if there is no user or -u flag.
 	args := strings.Split(launchArgs, " ")
 	for index, arg := range args {
 		if arg == "-u" {
-			owner <- args[index+1]
+			return args[index+1]
 		}
 	}
-	owner <- "not found"
+	return "not found"
 }
