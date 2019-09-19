@@ -19,7 +19,7 @@ type Metadata struct {
 // CollectMetadata parses the config file for important
 // data points and returns the formatted metadata
 func CollectMetadata(config string) map[string]Metadata {
-	logger.Disklog.Infof("Started collecting metadata from %s", config)
+	logger.Disklog.Debugf("Started collecting metadata from %s", config)
 	meta := make(map[string]Metadata)
 	file, _ := os.Open(config)
 	fscanner := bufio.NewScanner(file)

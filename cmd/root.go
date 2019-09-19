@@ -37,9 +37,13 @@ program.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		logfile, err := cmd.Flags().GetString("logfile")
 		if err != nil {
-			logger.Disklog.Warn("Problem retrieving logfile flag", err)
+			logger.Disklog.Warn("Problem retrieving logfile flag: ", err)
 		}
-		logger.SetupLogfile(logfile)
+		verbose, err := cmd.Flags().GetBool("verbose")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving verbosity flag: ", err)
+		}
+		logger.SetupLogfile(logfile, verbose)
 	},
 	// Run: func(cmd *cobra.Command, args []string) {
 	// },
@@ -56,7 +60,7 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().Bool("version", false, "Print the version of sauced")
-	rootCmd.Flags().Bool("verbose", false, "Print out all sauced logging information")
+	rootCmd.PersistentFlags().Bool("verbose", false, "Print out all sauced logging information")
 	rootCmd.PersistentFlags().StringP("logfile", "l", "/tmp/sauced.log", "logfile for meta-status output")
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
