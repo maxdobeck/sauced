@@ -48,8 +48,8 @@ func CollectMetadata(config string) map[string]Metadata {
 	return meta
 }
 
-// PoolName takes the launchArgs and parses for the
-// tunnel name, if no name returns 'anonymous'
+// PoolName takes the launchArgs and returns the
+// tunnel name to the channel, if no name returns 'anonymous'
 func PoolName(launchArgs string, pool chan string) {
 	//return the -i flag or anonymous if there is no name
 	args := strings.Split(launchArgs, " ")

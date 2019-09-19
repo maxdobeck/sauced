@@ -27,18 +27,13 @@ type Tunnel struct {
 	Metadata   Metadata  `json:"metadata"`
 }
 
-// Empty returns true if there are no tunnels, false if one ore more tunnels are present
+// Empty returns true if there are no tunnels, false if one or more tunnels are present
 func (tState LastKnownTunnels) Empty() bool {
 	if len(tState.Tunnels) == 0 {
 		return true
 	}
 	return false
 }
-
-// add later
-// func (tun Tunnel) rotateLog() error {
-// 	return nil
-// }
 
 // FindTunnelByPID gets a PID int and finds a given tunnel
 func (tState LastKnownTunnels) FindTunnelByPID(targetPID int) (Tunnel, error) {
