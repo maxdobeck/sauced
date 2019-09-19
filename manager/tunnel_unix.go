@@ -67,7 +67,7 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta, tunLog, asgnID)
 		}
 	}
-	logger.Disklog.Infof("Sauce Connect client with PID %d shutting down!  Goodbye!", scCmd.Process.Pid)
+	logger.Disklog.Infof("Sauce Connect client with PID %d shutting down!  If you want more details check our logfile %s  Goodbye!", scCmd.Process.Pid, tunLog)
 	RemoveTunnel(scCmd.Process.Pid)
 	defer scCmd.Wait()
 }
