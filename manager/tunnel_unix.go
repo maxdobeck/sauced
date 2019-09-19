@@ -28,7 +28,6 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 		return
 	}
 
-	// setDefaults() should go here.  take launchArgs and add all necessary default args/flags.
 	manufacturedArgs := setDefaults(args)
 	meta.Owner = GetOwner(strings.Join(manufacturedArgs, " "))
 	logger.Disklog.Debug("Created new set of args with sensible defaults that will be passed to exec.Command: ", manufacturedArgs)
