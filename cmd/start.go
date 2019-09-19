@@ -35,13 +35,6 @@ var startCmd = &cobra.Command{
 	Short: "Start all tunnels listed in your config file you reference.",
 	Long:  `Start all tunnels in the config file you reference like $ sauced start ~/my-config.txt`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		logfile, err := cmd.Flags().GetString("logfile")
-		if err != nil {
-			logger.Disklog.Warn("Problem retrieving logfile flag", err)
-		}
-		logger.SetupLogfile(logfile)
-
 		configFile, err := cmd.Flags().GetString("config")
 		if err != nil {
 			logger.Disklog.Warn("Problem retrieving config file flag", err)
