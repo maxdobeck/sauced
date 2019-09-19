@@ -4,10 +4,12 @@ package manager
 
 import (
 	"bufio"
+	"math/rand"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/mdsauce/sauced/logger"
 )
@@ -25,10 +27,14 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 		logger.Disklog.Warnf("Too many tunnels open.  Not opening %s \n %v", meta.Pool, launchArgs)
 		return
 	}
-	// setDefaults() should go here.  take launchArgs and add all necessary default args/flags.
+
 	manufacturedArgs := setDefaults(args)
+	meta.Owner = GetOwner(strings.Join(manufacturedArgs, " "))
 	logger.Disklog.Debug("Created new set of args with sensible defaults that will be passed to exec.Command: ", manufacturedArgs)
 	// tunnel is actually launched here.  new process is spawned
+	rand.Seed(time.Now().UnixNano())
+	wait := rand.Intn(15)
+	time.Sleep(time.Duration(wait) * time.Second)
 	scCmd := exec.Command(path, manufacturedArgs[1:]...)
 	stdout, _ := scCmd.StdoutPipe()
 	err := scCmd.Start()
@@ -37,7 +43,7 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 		return
 	}
 
-	logger.Disklog.Infof("Tunnel started as process %d - %s\n", scCmd.Process.Pid, launchArgs)
+	logger.Disklog.Infof("Tunnel started as process %d - %s.  Raw launch arguments: %s\n", scCmd.Process.Pid, manufacturedArgs, launchArgs)
 	scanner := bufio.NewScanner(stdout)
 	scanner.Split(bufio.ScanLines)
 
@@ -63,7 +69,7 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta, tunLog, asgnID)
 		}
 	}
-	logger.Disklog.Infof("Sauce Connect client with PID %d shutting down!  Goodbye!", scCmd.Process.Pid)
+	logger.Disklog.Infof("Sauce Connect client with PID %d shutting down!  If you want more details check our logfile %s  Goodbye!", scCmd.Process.Pid, tunLog)
 	RemoveTunnel(scCmd.Process.Pid)
 	defer scCmd.Wait()
 }
