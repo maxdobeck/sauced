@@ -5,7 +5,7 @@ import (
 )
 
 func balance(lastState []Tunnel, pool string) int {
-	logger.Disklog.Infof("Counting active tunnels from Last Known State: %v", lastState)
+	logger.Disklog.Debugf("Counting active tunnels from Last Known State: %v", lastState)
 	count := 0
 	for _, tunnel := range lastState {
 		if tunnel.Metadata.Pool == pool {

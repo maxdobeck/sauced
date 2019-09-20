@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mdsauce/sauced/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +33,18 @@ Each tunnel should be on one line and separated by a newline character.  Use the
 to start all the specified tunnels.  Stop cmd will stop all tunnels that were started by the
 program.`,
 	Version: fmt.Sprintf("%s", CurVersion),
+	// Persistent*Run hooks are inherited by all subcommands if they do not have hooks themselves
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		logfile, err := cmd.Flags().GetString("logfile")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving logfile flag: ", err)
+		}
+		verbose, err := cmd.Flags().GetBool("verbose")
+		if err != nil {
+			logger.Disklog.Warn("Problem retrieving verbosity flag: ", err)
+		}
+		logger.SetupLogfile(logfile, verbose)
+	},
 	// Run: func(cmd *cobra.Command, args []string) {
 	// },
 }
@@ -47,11 +60,12 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().Bool("version", false, "Print the version of sauced")
+	rootCmd.PersistentFlags().Bool("verbose", false, "Print out all sauced logging information")
+	rootCmd.PersistentFlags().StringP("logfile", "l", "/tmp/sauced.log", "logfile for meta-status output")
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/sauced.yaml)")
-	rootCmd.PersistentFlags().StringP("logfile", "l", "/tmp/sauced.log", "logfile for meta-status output")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

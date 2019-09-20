@@ -57,13 +57,13 @@ func Start(launchArgs string, wg *sync.WaitGroup, meta Metadata) {
 		if strings.Contains(m, "Log file:") {
 			ll := strings.Split(m, " ")
 			tunLog = ll[len(ll)-1]
-			logger.Disklog.Infof("Tunnel log started for tunnel: %s \n %s", launchArgs, m)
+			logger.Disklog.Debugf("Tunnel log started for tunnel: %s \n %s", launchArgs, m)
 		}
 		// should be a func that is unit tested
 		if strings.Contains(m, "Tunnel ID:") {
 			idLine := strings.Split(m, " ")
 			asgnID = idLine[len(idLine)-1]
-			logger.Disklog.Infof("Tunnel: %s has AssignedID %s", launchArgs, asgnID)
+			logger.Disklog.Infof("TUNNEL IS ALIVE as process %d with Assigned ID %s. args: %s", scCmd.Process.Pid, asgnID, manufacturedArgs)
 		}
 		if strings.Contains(m, "Sauce Connect is up") {
 			AddTunnel(launchArgs, path, scCmd.Process.Pid, meta, tunLog, asgnID)
@@ -93,7 +93,7 @@ func StopTunnelByID(assignedID string) {
 	tunnel, err := tstate.FindTunnelByID(assignedID)
 
 	if err != nil {
-		logger.Disklog.Info(err)
+		logger.Disklog.Warn(err)
 	} else {
 		Stop(tunnel.PID)
 	}
@@ -106,7 +106,7 @@ func StopTunnelsByPool(poolName string) {
 	tunnels, err := tstate.FindTunnelsByPool(poolName)
 
 	if err != nil {
-		logger.Disklog.Info(err)
+		logger.Disklog.Warn(err)
 	} else {
 		for _, tunnel := range tunnels {
 			Stop(tunnel.PID)

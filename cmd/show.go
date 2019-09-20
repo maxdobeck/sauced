@@ -27,13 +27,6 @@ var showCmd = &cobra.Command{
 	Short: "List all last known tunnels.",
 	Long:  `The tunnel state list will be pruned and then all active tunnels will be shown.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//TODO: This should be it's function since it's called on all files.
-		logfile, err := cmd.Flags().GetString("logfile")
-		if err != nil {
-			logger.Disklog.Warn("Problem retrieving logfile flag", err)
-		}
-		logger.SetupLogfile(logfile)
-
 		pretty, err := cmd.Flags().GetBool("pretty")
 		if err != nil {
 			logger.Disklog.Warn("Problem retrieving pretty flag", err)
