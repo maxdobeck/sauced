@@ -27,7 +27,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var defaultConfigPath = "/sauced/sauced-config.txt"
+var defaultConfigPath = "/sauced/sauced.config"
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
@@ -41,7 +41,8 @@ var startCmd = &cobra.Command{
 		}
 
 		if !configUsable(configFile) {
-			logger.Disklog.Warn("You did not specify a config file!  Please pass in a file like 'sauced start --config /path/to/sauced-config.txt")
+			logger.Disklog.Warn("You did not specify a config file! Please pass in a file like 'sauced start --config /path/to/sauced-config.txt'")
+			logger.Disklog.Debug("Checking for config file in any XDG_HOME_CONFIG environment variables.")
 			configFile = findXdgConfigHome()
 
 			if len(configFile) < 2 {
@@ -114,10 +115,9 @@ func configUsable(file string) bool {
 }
 
 func findXdgConfigHome() string {
-	logger.Disklog.Debug("Looking for sauced-config.txt on XDG_CONFIG_HOME")
-
 	xdgHome, isXdgSet := os.LookupEnv("XDG_CONFIG_HOME")
 	xdgConfigPath := path.Join(xdgHome, defaultConfigPath)
+	logger.Disklog.Debugf("Looking for %s on XDG_CONFIG_HOME: %s", defaultConfigPath, xdgHome)
 
 	if !isXdgSet {
 		logger.Disklog.Debug("XDG_CONFIG_HOME not set. Exiting.")
@@ -130,7 +130,7 @@ func findXdgConfigHome() string {
 	}
 	// If we got here it means that there is a config file located on XDG_CONFIG_HOME
 	// assigning configFile to it
-	logger.Disklog.Debugf("Found config file. Setting to %s", xdgConfigPath)
+	logger.Disklog.Debugf("Found config file %s. Setting to %s", defaultConfigPath, xdgConfigPath)
 
 	//TODO: Add unit/integration test to check that we are actually
 	configFile := xdgConfigPath
