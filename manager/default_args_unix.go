@@ -105,6 +105,13 @@ func addDefaults(tunnelArgs []string) []string {
 
 func setLogfile(logfileArg string) string {
 	defaultLogfile := ""
+	_, err := os.Stat(logfileArg)
+	if err != nil {
+		if os.IsNotExist(err) {
+			logger.Disklog.Errorf("Cannot find file '%s' it does not exist.  Double-check the spelling", logfileArg)
+		}
+		logger.Disklog.Warnf("Problem getting information about file '%s' it may not exist.", logfileArg)
+	}
 
 	// set a logfile name if there isn't one
 	lastChars := logfileArg[len(logfileArg)-4:]
