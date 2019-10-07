@@ -1,7 +1,3 @@
-[owner]
-username = "max.dobeck"
-accesskey = "my-access-key"
-
 [my-main-pool]
 pool-size = 3
 very-verbose: false
