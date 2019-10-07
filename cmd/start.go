@@ -41,47 +41,6 @@ var startCmd = &cobra.Command{
 	Long:  `Start all tunnels in the config file you reference like $ sauced start ~/my-config.txt`,
 	Run: func(cmd *cobra.Command, args []string) {
 		launch(configFile)
-
-		if viper.ConfigFileUsed() == "" {
-
-			if !configUsable(configFile) {
-				logger.Disklog.Warn("You did not specify a config file! Pass in a file like 'sauced start --config /path/to/sauced-config.txt'")
-				logger.Disklog.Debug("Checking for config file in any XDG_HOME_CONFIG environment variables.")
-				configFile = findXdgConfigHome()
-
-				if len(configFile) < 2 {
-					logger.Disklog.Error("Problem retrieving config file flag.")
-					os.Exit(1)
-
-				}
-			}
-			if !strings.Contains(configFile, ".config") {
-				logger.Disklog.Error("Config file is not a .config: ", configFile)
-			}
-
-			manager.PruneState()
-			meta := manager.CollectMetadata(configFile)
-
-			var wg sync.WaitGroup
-			// read in the sc startup commands
-			file, _ := os.Open(configFile)
-			fscanner := bufio.NewScanner(file)
-			stop := make(chan os.Signal, 1)
-			for fscanner.Scan() {
-				if fscanner.Text() != "" || len(fscanner.Text()) != 0 {
-					wg.Add(1)
-					pool := manager.PoolName(fscanner.Text())
-					logger.Disklog.Debugf("%s pool is %s.  Metadata is %v", fscanner.Text(), pool, meta[pool])
-					go manager.Start(fscanner.Text(), &wg, meta[pool])
-				}
-			}
-			signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-			go func() {
-				<-stop
-				logger.Disklog.Warn("User pressed CTRL-C (SIGINT). Killing tunnels now.  Active jobs using these tunnels may die.")
-			}()
-			wg.Wait()
-		}
 	},
 }
 
@@ -166,7 +125,7 @@ func findXdgConfigHome() string {
 	// assigning configFile to it
 	logger.Disklog.Debugf("Found config file %s. Setting to %s", defaultConfigPath, xdgConfigPath)
 
-	//TODO: Add unit/integration test to check that we are actually
+	//TODO: Add unit/integration test
 	configFile := xdgConfigPath
 
 	return configFile
@@ -174,15 +133,59 @@ func findXdgConfigHome() string {
 
 func launch(config string) {
 	if strings.Contains(config, ".yaml") {
-		logger.Disklog.Error("YAML config files are not supported at this time.  Cannot use config file: ", configFile)
-	}
-
-	if strings.Contains(viper.ConfigFileUsed(), ".toml") || strings.Contains(config, ".toml") {
+		logger.Disklog.Error("YAML is not supported at this time.  Cannot use config file: ", configFile)
+	} else if strings.Contains(viper.ConfigFileUsed(), ".toml") || strings.Contains(config, ".toml") {
 		if viper.ConfigFileUsed() != "" {
 			if !configUsable(viper.ConfigFileUsed()) {
 				os.Exit(1)
 			}
-			logger.Disklog.Debug("Found TOML config file: ", viper.ConfigFileUsed())
+			logger.Disklog.Info("Found TOML config file: ", viper.ConfigFileUsed())
+		}
+	} else if viper.ConfigFileUsed() == "" && configFile == "" {
+		unstructuredConfig(findXdgConfigHome())
+	} else {
+		unstructuredConfig(configFile)
+	}
+
+}
+
+func unstructuredConfig(configFile string) {
+	logger.Disklog.Debug("Using config: ", configFile)
+	if !configUsable(configFile) {
+		logger.Disklog.Warn("You did not specify a config file! Pass in a file like 'sauced start --config /path/to/sauced-config.txt'")
+		logger.Disklog.Debug("Checking for config file in any XDG_HOME_CONFIG environment variables.")
+		configFile = findXdgConfigHome()
+
+		if len(configFile) < 2 {
+			logger.Disklog.Error("Problem retrieving config file flag.")
+			os.Exit(1)
+
 		}
 	}
+	if !strings.Contains(configFile, ".config") {
+		logger.Disklog.Error("Config file is not a .config: ", configFile)
+	}
+
+	manager.PruneState()
+	meta := manager.CollectMetadata(configFile)
+
+	var wg sync.WaitGroup
+	// read in the sc startup commands
+	file, _ := os.Open(configFile)
+	fscanner := bufio.NewScanner(file)
+	stop := make(chan os.Signal, 1)
+	for fscanner.Scan() {
+		if fscanner.Text() != "" || len(fscanner.Text()) != 0 {
+			wg.Add(1)
+			pool := manager.PoolName(fscanner.Text())
+			logger.Disklog.Debugf("%s pool is %s.  Metadata is %v", fscanner.Text(), pool, meta[pool])
+			go manager.Start(fscanner.Text(), &wg, meta[pool])
+		}
+	}
+	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-stop
+		logger.Disklog.Warn("User pressed CTRL-C (SIGINT). Killing tunnels now.  Active jobs using these tunnels may die.")
+	}()
+	wg.Wait()
 }
