@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"os/signal"
 	"path"
@@ -24,10 +25,13 @@ import (
 
 	"github.com/mdsauce/sauced/logger"
 	"github.com/mdsauce/sauced/manager"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var defaultConfigPath = "/sauced/sauced.config"
+var configFile string
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
@@ -78,6 +82,7 @@ var startCmd = &cobra.Command{
 }
 
 func init() {
+	cobra.OnInitialize(initConfig)
 	rootCmd.AddCommand(startCmd)
 	startCmd.PersistentFlags().StringP("config", "c", "", "config file for tunnels to start.")
 
@@ -90,6 +95,40 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// startCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func initConfig() {
+	if configFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(configFile)
+	} else {
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		// Search config in home directory with name ".sauced" (without extension).
+		viper.SetConfigType("toml")
+		viper.AddConfigPath(home)
+		viper.AddConfigPath("$HOME/.config")
+		viper.AddConfigPath("$HOME/.config/sauced")
+		viper.AddConfigPath("$HOME/.sauced/config")
+		viper.AddConfigPath("$HOME/.sauced")
+		//check for XDG_CONFIG_HOME somewhere in here
+		viper.SetConfigName("sauced")
+		viper.SetConfigName("default")
+		// call this AFTER setting paths
+		viper.WatchConfig()
+	}
+
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		logger.Disklog.Debug("Using config file:", viper.ConfigFileUsed())
+	} else {
+		logger.Disklog.Error("Problem reading config file: ", err)
+	}
 }
 
 func configUsable(file string) bool {
