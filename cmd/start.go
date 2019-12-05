@@ -52,10 +52,9 @@ func init() {
 
 func initConfig() {
 	if configFile != "" {
-		// Use config file from the flag.
+		// Use config file from the --config flag.
 		viper.SetConfigFile(configFile)
 	} else {
-		// Find home directory.
 		home, err := homedir.Dir()
 		if err != nil {
 			fmt.Println(err)
@@ -132,21 +131,18 @@ func findXdgConfigHome() string {
 }
 
 func launch(config string) {
+	if !configUsable(viper.ConfigFileUsed()) {
+		os.Exit(1)
+	}
 	if strings.Contains(config, ".yaml") {
 		logger.Disklog.Error("YAML is not supported at this time.  Cannot use config file: ", configFile)
 	} else if strings.Contains(viper.ConfigFileUsed(), ".toml") || strings.Contains(config, ".toml") {
-		if viper.ConfigFileUsed() != "" {
-			if !configUsable(viper.ConfigFileUsed()) {
-				os.Exit(1)
-			}
-			logger.Disklog.Info("Found TOML config file: ", viper.ConfigFileUsed())
-		}
+		logger.Disklog.Info("Found TOML config file: ", viper.ConfigFileUsed())
 	} else if viper.ConfigFileUsed() == "" && configFile == "" {
 		unstructuredConfig(findXdgConfigHome())
 	} else {
 		unstructuredConfig(configFile)
 	}
-
 }
 
 func unstructuredConfig(configFile string) {
