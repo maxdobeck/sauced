@@ -1,0 +1,6 @@
+[my-main-pool]
+pool-size = 3
+very-verbose: false
+
+[no-bump-tunnel]
+no-bump = "all"
