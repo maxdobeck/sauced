@@ -57,7 +57,7 @@ func initConfig() {
 	} else {
 		home, err := homedir.Dir()
 		if err != nil {
-			fmt.Println(err)
+			logger.Disklog.Warn(err)
 			os.Exit(1)
 		}
 
@@ -138,11 +138,34 @@ func launch(config string) {
 		logger.Disklog.Error("YAML is not supported at this time.  Cannot use config file: ", configFile)
 	} else if strings.Contains(viper.ConfigFileUsed(), ".toml") || strings.Contains(config, ".toml") {
 		logger.Disklog.Info("Found TOML config file: ", viper.ConfigFileUsed())
+		configMap := make(map[string]manager.TunnelArgs)
+		if err := viper.ReadInConfig(); err != nil {
+			logger.Disklog.Fatalf("Error reading config file, %s", err)
+		}
+		err := viper.Unmarshal(&configMap)
+		if err != nil {
+			logger.Disklog.Fatalf("Unable to unmarshal config file %s: %v", viper.ConfigFileUsed(), err)
+		}
+		configs := mapToSlice(configMap)
+		fmt.Println(configs)
 	} else if viper.ConfigFileUsed() == "" && configFile == "" {
 		unstructuredConfig(findXdgConfigHome())
 	} else {
 		unstructuredConfig(configFile)
 	}
+}
+
+func mapToSlice(config map[string]manager.TunnelArgs) []manager.TunnelArgs {
+	c := []manager.TunnelArgs{}
+	i := 0
+	for k, v := range config {
+		c = append(c, v)
+		c[i].TunnelIdentifier = k
+		i++
+	}
+	logger.Disklog.Debugf("Converted map %v to slice %v", c, config)
+	logger.Disklog.Debug("Pool Size is: ", c[0].PoolSize)
+	return c
 }
 
 func unstructuredConfig(configFile string) {

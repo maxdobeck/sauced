@@ -1,6 +1,6 @@
-[my-main-pool]
+[simple-tunnel]    
 pool-size = 3
-very-verbose: false
+very-verbose = false
 
-[no-bump-tunnel]
-no-bump = "all"
+[verbose-troubleshooting]
+very-verbose = true
