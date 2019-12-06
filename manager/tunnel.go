@@ -1,7 +1,7 @@
 package manager
 
-// TunnelConfig represents all the configs collected from a user's config file
-type TunnelConfig struct {
+// TunnelArgs represents all the configs collected from a user's config file
+type TunnelArgs struct {
 	Owner                  string   `json:"owner" mapstructure:"owner"`
 	APIKey                 string   `json:"api_key" mapstructure:"api-key"`
 	Cainfo                 string   `json:"cainfo" mapstructure:"cainfo"`

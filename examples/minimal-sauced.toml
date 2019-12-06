@@ -1,4 +1,3 @@
-[tunnel]
-tunnel-identifier = "simple-tunnel"
+[simple-tunnel]    
 pool-size = 3
 very-verbose = false
