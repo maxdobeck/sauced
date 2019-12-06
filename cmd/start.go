@@ -138,7 +138,7 @@ func launch(config string) {
 		logger.Disklog.Error("YAML is not supported at this time.  Cannot use config file: ", configFile)
 	} else if strings.Contains(viper.ConfigFileUsed(), ".toml") || strings.Contains(config, ".toml") {
 		logger.Disklog.Info("Found TOML config file: ", viper.ConfigFileUsed())
-		var configs []manager.TunnelConfig
+		configs := make(map[string]manager.TunnelConfig)
 		if err := viper.ReadInConfig(); err != nil {
 			logger.Disklog.Fatalf("Error reading config file, %s", err)
 		}
@@ -146,7 +146,9 @@ func launch(config string) {
 		if err != nil {
 			logger.Disklog.Fatalf("Unable to unmarsahll config file %s into TunnelConfig struct(s): %v", viper.ConfigFileUsed(), err)
 		}
+		fmt.Println(viper.Get("tunnel"))
 		fmt.Println(configs)
+		fmt.Println("Pool Size is: ", configs["tunnel"].PoolSize)
 	} else if viper.ConfigFileUsed() == "" && configFile == "" {
 		unstructuredConfig(findXdgConfigHome())
 	} else {
