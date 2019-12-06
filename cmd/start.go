@@ -57,7 +57,7 @@ func initConfig() {
 	} else {
 		home, err := homedir.Dir()
 		if err != nil {
-			fmt.Println(err)
+			logger.Disklog.Warn(err)
 			os.Exit(1)
 		}
 
@@ -163,8 +163,8 @@ func mapToSlice(config map[string]manager.TunnelArgs) []manager.TunnelArgs {
 		c[i].TunnelIdentifier = k
 		i++
 	}
-	fmt.Println(c, config)
-	fmt.Println("Pool Size is: ", c[0].PoolSize)
+	logger.Disklog.Debugf("Converted map %v to slice %v", c, config)
+	logger.Disklog.Debug("Pool Size is: ", c[0].PoolSize)
 	return c
 }
 
