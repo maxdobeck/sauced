@@ -1,6 +1,4 @@
-[my-main-pool]
+[tunnel-pool-1]
+tunnel-identifier = "simple-tunnel"
 pool-size = 3
-very-verbose: false
-
-[no-bump-tunnel]
-no-bump = "all"
+very-verbose = false
